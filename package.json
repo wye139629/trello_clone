@@ -10,7 +10,7 @@
     "test": "jest",
     "dev": "cross-env NODE_ENV=development webpack server",
     "lint": "eslint --ignore-path .gitignore .",
-    "prettier": "prettier --ignore-path .gitignore \"**/*.+(js|json)\"",
+    "prettier": "prettier --ignore-path .gitignore \"**/*.+(js|json|jsx)\"",
     "check-format": "yarn run prettier --list-different",
     "format": "yarn run prettier --write",
     "build": "rimraf ./dist && cross-env NODE_ENV=production webpack",
@@ -40,6 +40,8 @@
     "html-loader": "^2.1.2",
     "html-webpack-plugin": "^5.3.2",
     "http-server": "^0.12.3",
+    "husky": "^7.0.0",
+    "lint-staged": "^12.1.2",
     "mini-css-extract-plugin": "^2.1.0",
     "prettier": "^2.5.1",
     "sass": "^1.35.2",
@@ -47,7 +49,6 @@
     "style-loader": "^3.1.0",
     "webpack": "^5.65.0",
     "webpack-cli": "^4.9.1",
-    "webpack-dev-server": "^4.6.0",
-    "husky": "^7.0.0"
+    "webpack-dev-server": "^4.6.0"
   }
 }
