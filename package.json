@@ -14,7 +14,8 @@
     "check-format": "yarn run prettier --list-different",
     "format": "yarn run prettier --write",
     "build": "rimraf ./dist && cross-env NODE_ENV=production webpack",
-    "validate": "yarn run check-format && yarn run lint && yarn run build"
+    "validate": "yarn run check-format && yarn run lint && yarn run build",
+    "prepare": "husky install"
   },
   "author": "William",
   "license": "ISC",
@@ -46,6 +47,7 @@
     "style-loader": "^3.1.0",
     "webpack": "^5.65.0",
     "webpack-cli": "^4.9.1",
-    "webpack-dev-server": "^4.6.0"
+    "webpack-dev-server": "^4.6.0",
+    "husky": "^7.0.0"
   }
 }
