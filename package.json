@@ -1,7 +1,7 @@
 {
-  "name": "todo_app",
+  "name": "trello-clone",
   "version": "1.0.0",
-  "description": "'a task management app'",
+  "description": "A task management app like trello",
   "main": "index.js",
   "directories": {
     "test": "test"
