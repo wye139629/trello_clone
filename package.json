@@ -9,7 +9,12 @@
   "scripts": {
     "test": "jest",
     "dev": "cross-env NODE_ENV=development webpack server",
-    "build": "rimraf ./dist && cross-env NODE_ENV=production webpack"
+    "lint": "eslint --ignore-path .gitignore .",
+    "prettier": "prettier --ignore-path .gitignore \"**/*.+(js|json)\"",
+    "check-format": "yarn run prettier --list-different",
+    "format": "yarn run prettier --write",
+    "build": "rimraf ./dist && cross-env NODE_ENV=production webpack",
+    "validate": "yarn run check-format && yarn run lint && yarn run build"
   },
   "author": "William",
   "license": "ISC",
@@ -21,20 +26,26 @@
   "devDependencies": {
     "@babel/cli": "^7.16.0",
     "@babel/core": "^7.16.0",
+    "@babel/eslint-parser": "^7.16.3",
     "@babel/preset-env": "^7.16.4",
     "@babel/preset-react": "^7.16.0",
     "babel-loader": "^8.2.2",
     "css-loader": "^6.0.0",
+    "eslint": "^8.4.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-react": "^7.27.1",
+    "eslint-plugin-react-hooks": "^4.3.0",
     "file-loader": "^6.2.0",
     "html-loader": "^2.1.2",
     "html-webpack-plugin": "^5.3.2",
     "http-server": "^0.12.3",
     "mini-css-extract-plugin": "^2.1.0",
+    "prettier": "^2.5.1",
     "sass": "^1.35.2",
     "sass-loader": "^12.1.0",
     "style-loader": "^3.1.0",
+    "webpack": "^5.65.0",
     "webpack-cli": "^4.9.1",
-    "webpack-dev-server": "^4.6.0",
-    "webpack": "^5.65.0"
+    "webpack-dev-server": "^4.6.0"
   }
 }

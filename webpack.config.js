@@ -1,13 +1,13 @@
 const path = require('path')
 const isDevMode = process.env.NODE_ENV === 'development'
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CONTENT_HASH = isDevMode ? '' : '-[contenthash]'
 
 module.exports = {
   mode: process.env.NODE_ENV,
-  entry:{
-    app: ['./src/index.js']
+  entry: {
+    app: ['./src/index.js'],
   },
   output: {
     filename: `[name]${CONTENT_HASH}.js`,
@@ -15,21 +15,18 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
   },
   resolve: {
-    modules: [
-      path.resolve('src'),
-      path.resolve('node_modules')
-    ],
+    modules: [path.resolve('src'), path.resolve('node_modules')],
     alias: {
-      '@': path.resolve('src') // 設定 import 的絕對路徑
+      '@': path.resolve('src'), // 設定 import 的絕對路徑
     },
-    extensions: ['.js', '.json', '.jsx']
+    extensions: ['.js', '.json', '.jsx'],
   },
-  module:{
+  module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
         use: {
-          loader: 'babel-loader'
+          loader: 'babel-loader',
         },
         include: [path.resolve('src')],
         exclude: /node_modules/,
@@ -43,20 +40,20 @@ module.exports = {
           },
           // Translates CSS into CommonJS
           {
-            loader: "css-loader",
+            loader: 'css-loader',
             options: {
-              sourceMap: true
-            }
+              sourceMap: true,
+            },
           },
           // Compiles Sass to CSS
           {
-           loader: "sass-loader",
+            loader: 'sass-loader',
             options: {
               sourceMap: true,
-            }
-          }
+            },
+          },
         ],
-        include: path.resolve('src/styles')
+        include: path.resolve('src/styles'),
       },
       {
         test: /\.(png|jpe?g|gif)$/i,
@@ -65,8 +62,8 @@ module.exports = {
             loader: 'file-loader',
             options: {
               limit: 2048, // 小於 2048k 自動轉成 base64 字串
-              name: '[path][name].[ext]'
-            }
+              name: '[path][name].[ext]',
+            },
           },
         ],
       },
@@ -75,9 +72,9 @@ module.exports = {
         use: {
           loader: 'html-loader',
         },
-        include: path.resolve('public')
+        include: path.resolve('public'),
       },
-    ]
+    ],
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -85,21 +82,21 @@ module.exports = {
       filename: 'index.html',
     }),
     new MiniCssExtractPlugin({
-      filename: `style${CONTENT_HASH}.css`
-    })
+      filename: `style${CONTENT_HASH}.css`,
+    }),
   ],
   optimization: {
-    splitChunks:{
+    splitChunks: {
       chunks: 'all',
       cacheGroups: {
         verdors: {
           name: 'verdors', // 第三方套件都會被打包成 verdors 這個檔案
           chunks: 'all',
-          test:/[\\/]node_modules[\\/]/, //從 node_modules 撈出來的套件都會被整合
+          test: /[\\/]node_modules[\\/]/, //從 node_modules 撈出來的套件都會被整合
           priority: 10, // 優先做這個設定
           enforce: true, // 強制套用這邊的設定
-        }
-      }
-    }
-  }
+        },
+      },
+    },
+  },
 }
