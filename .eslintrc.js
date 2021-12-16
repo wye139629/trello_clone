@@ -18,6 +18,7 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'warn',
     'react/jsx-uses-react': 'error',
     'react/jsx-uses-vars': 'error',
+    'react/react-in-jsx-scope': 'warn',
   },
   parser: '@babel/eslint-parser',
   env: {

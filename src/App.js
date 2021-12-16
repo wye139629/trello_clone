@@ -1,7 +1,20 @@
-import React from 'react'
+import styled from '@emotion/styled'
+
+const Headline = styled.div({
+  color: 'blue',
+})
 
 function App() {
-  return <div>hello</div>
+  return (
+    <Headline
+      css={{
+        fontSize: '30px',
+        color: 'red',
+      }}
+    >
+      hello
+    </Headline>
+  )
 }
 
 export default App
