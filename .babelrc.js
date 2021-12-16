@@ -8,5 +8,9 @@ module.exports = {
       { runtime: 'automatic', importSource: '@emotion/react' },
     ],
   ],
-  plugins: ['@emotion/babel-plugin'],
+  plugins: [
+    '@emotion/babel-plugin',
+    'babel-plugin-twin',
+    'babel-plugin-macros',
+  ],
 }
