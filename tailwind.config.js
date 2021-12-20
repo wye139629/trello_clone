@@ -19,6 +19,9 @@ module.exports = {
       gray: colors.gray,
       red: colors.red,
       green: colors.green,
+      blue: colors.blue,
+      sky: colors.sky,
+      cyan: colors.cyan,
     },
     zIndex: {
       0: 0,

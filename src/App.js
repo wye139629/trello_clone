@@ -1,19 +1,10 @@
-import styled from '@emotion/styled'
-
-const Headline = styled.div({
-  color: 'blue',
-})
+import Navbar from 'components/nav/Navbar'
 
 function App() {
   return (
-    <Headline
-      css={{
-        fontSize: '30px',
-        color: 'red',
-      }}
-    >
-      hello
-    </Headline>
+    <>
+      <Navbar></Navbar>
+    </>
   )
 }
 
