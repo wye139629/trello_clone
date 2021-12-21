@@ -3,10 +3,11 @@ import Icon from './Icon'
 import { faSearch, faTimes } from 'lib/fontawsome/icons'
 import { useState } from 'react'
 
-const Button = tw.button`rounded border-0 bg-transparent py-[4px] px-[6px] cursor-pointer text-gray-500 hover:bg-gray-200/60 ml-auto`
+const Button = tw.button`rounded border-0 bg-transparent cursor-pointer text-gray-500 hover:bg-gray-200/60 ml-auto px-[8px]`
 
 export function SearchForm() {
   const [isFocus, setIsFocus] = useState(false)
+  const [searchValue, setSearchValue] = useState('')
 
   function onFoucsHandler() {
     setIsFocus(true)
@@ -15,12 +16,16 @@ export function SearchForm() {
   function onBlurHandler() {
     setIsFocus(false)
   }
+
+  function onChangeHandler(e) {
+    setSearchValue(e.target.value)
+  }
   return (
     <form>
       <div
         css={[
-          tw`bg-white/20 flex items-center rounded px-[10px] py-[4px] hover:bg-white/30`,
-          isFocus && tw`bg-white hover:bg-white`,
+          tw`bg-white/20 flex items-center rounded px-[10px] py-[4px] hover:bg-white/30 border border-white/30`,
+          isFocus && tw`bg-white text-black hover:bg-white`,
         ]}
       >
         <Icon name={faSearch} size="sm" css={isFocus && tw`text-gray-500`} />
@@ -30,6 +35,8 @@ export function SearchForm() {
           placeholder="搜尋..."
           onFocus={onFoucsHandler}
           onBlur={onBlurHandler}
+          onChange={onChangeHandler}
+          value={searchValue}
         />
         {isFocus && (
           <Button>

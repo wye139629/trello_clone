@@ -3,7 +3,7 @@ import Board from './Board'
 import { css } from 'twin.macro'
 
 const kanbanStyle = css`
-  height: calc(100vh - 47px);
+  height: calc(100vh - 52px);
   display: flex;
 `
 
