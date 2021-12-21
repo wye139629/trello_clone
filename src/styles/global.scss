@@ -1,24 +1,3 @@
-html,
-body {
-  overflow-x: hidden;
-  padding: 0;
-  margin: 0;
-}
-
-select {
-  @apply bg-white;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-img,
-svg {
-  object-fit: contain;
-}
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
