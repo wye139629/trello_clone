@@ -1,4 +1,4 @@
-import Icon from 'components/shared/Icon'
+import { Icon } from 'components/shared'
 import { faChevronLeft, faPlus } from 'lib/fontawsome/icons'
 import tw from 'twin.macro'
 

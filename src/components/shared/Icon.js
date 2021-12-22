@@ -14,4 +14,4 @@ function Icon({ name, size, ...props }) {
   )
 }
 
-export default Icon
+export { Icon }

@@ -1,5 +1,5 @@
 import tw from 'twin.macro'
-import Icon from './Icon'
+import { Icon } from './Icon'
 import { faSearch, faTimes } from 'lib/fontawsome/icons'
 import { useState } from 'react'
 

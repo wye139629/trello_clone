@@ -24,6 +24,7 @@ module.exports = {
       cyan: colors.cyan,
     },
     zIndex: {
+      m1: -1,
       0: 0,
       10: 10,
       20: 20,

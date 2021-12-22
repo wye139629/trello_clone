@@ -1,7 +1,7 @@
 import { SearchForm } from './../shared/SearchForm'
 import tw from 'twin.macro'
 import { faChevronDown, faBell, faUser } from 'lib/fontawsome/icons'
-import Icon from 'components/shared/Icon'
+import { Icon } from 'components/shared'
 
 const Button = tw.button`rounded border-0 bg-transparent py-[6px] px-[10px] cursor-pointer text-white hover:bg-gray-200/30`
 

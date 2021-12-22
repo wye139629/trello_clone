@@ -1,0 +1,13 @@
+.default {
+  @apply absolute left-0;
+}
+
+.hidden {
+  @extend .default;
+  @apply z-m1;
+}
+
+.isEdit {
+  @extend .default;
+  @apply top-0 z-0;
+}
