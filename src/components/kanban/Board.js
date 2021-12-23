@@ -1,48 +1,28 @@
-import tw, { css } from 'twin.macro'
-import { useState } from 'react'
-import { Switcher, Displayer, Editor } from '../shared'
+import tw, { css, styled } from 'twin.macro'
 
-const BoardStyle = css`
-  width: calc(100vw - 260px);
-`
-const Button = tw.button`rounded border-0 bg-transparent py-[6px] px-[10px] cursor-pointer hover:bg-gray-200/50`
+import PropTypes from 'prop-types'
+import { BoardHeader } from './BoardHeader'
+import { BoardBody } from './BoardBody'
 
-function BoardHeader() {
-  const [kanbanTitle, setKanbanTitle] = useState('Trello-clone')
+const BoardContainer = styled.div(({ isOpen }) => [
+  tw`pl-6 w-screen`,
+  isOpen &&
+    css`
+      width: calc(100vw - 260px);
+      transition: width 0.5s;
+    `,
+])
 
-  return (
-    <div css={tw`h-[52px] flex items-center px-[8px]`}>
-      <Switcher>
-        <Displayer>
-          <Button>
-            <h4 css={tw`text-sky-900 text-xl font-extrabold`}>{kanbanTitle}</h4>
-          </Button>
-        </Displayer>
-        <Editor>
-          <input
-            css={[
-              tw`text-sky-900 text-xl font-extrabold px-[10px] py-[6px] focus:border-black`,
-            ]}
-            type="text"
-            value={kanbanTitle}
-            onChange={(e) => setKanbanTitle(e.target.value)}
-          />
-        </Editor>
-      </Switcher>
-    </div>
-  )
+Board.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
 }
 
-function BoardBody() {
-  return <div></div>
-}
-
-function Board() {
+function Board({ isOpen }) {
   return (
-    <div css={BoardStyle}>
+    <BoardContainer isOpen={isOpen}>
       <BoardHeader></BoardHeader>
       <BoardBody></BoardBody>
-    </div>
+    </BoardContainer>
   )
 }
 

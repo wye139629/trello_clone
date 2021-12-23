@@ -63,7 +63,7 @@ function Editor({ children: child }) {
   useLayoutEffect(() => {
     editorRef.current.style.width = `${displayerRef.current.offsetWidth}px`
     editorRef.current.style.height = `${displayerRef.current.offsetHeight}px`
-  }, [child.props.value])
+  })
 
   useLayoutEffect(() => {
     if (!isEdit) return
