@@ -1,3 +1,5 @@
+const path = require('path')
+
 module.exports = {
   parserOptions: {
     ecmaVersion: 2019,
@@ -30,4 +32,19 @@ module.exports = {
       version: 'detect',
     },
   },
+  overrides: [
+    {
+      env: {
+        jest: true,
+      },
+      files: ['**/__tests__/**/*.js'],
+      settings: {
+        'import/resolver': {
+          jest: {
+            jestConfigFile: path.join(__dirname, './jest.config.js'),
+          },
+        },
+      },
+    },
+  ],
 }
