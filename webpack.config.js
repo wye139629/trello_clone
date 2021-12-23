@@ -52,6 +52,9 @@ module.exports = {
               sourceMap: true,
             },
           },
+          {
+            loader: 'postcss-loader',
+          },
         ],
         include: path.resolve('src/styles'),
       },
