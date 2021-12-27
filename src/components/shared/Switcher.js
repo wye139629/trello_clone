@@ -78,6 +78,11 @@ function Editor({ children: child }) {
     className: isEdit ? 'isEdit' : 'hidden',
     onBlur: callAll(() => setIsEdit(false), child.props.onBlur),
     onFocus: callAll((e) => e.target.select(), child.props.onFocus),
+    onKeyDown: callAll((e) => {
+      if (e.keyCode === 13) {
+        return e.target.blur()
+      }
+    }, child.props.onKeyDown),
     ref: editorRef,
   })
 }
