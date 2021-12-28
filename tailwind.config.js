@@ -4,6 +4,9 @@ module.exports = {
   mode: 'jit',
   theme: {
     extend: {
+      colors: {
+        listGray: '#ebecf0',
+      },
       opacity: {
         35: '0.35',
       },

@@ -1,6 +1,6 @@
 import tw, { css, styled } from 'twin.macro'
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { StatusCard } from './StatusCard'
 import { Icon } from 'components/shared'
 import { faPlus, faTimes } from 'lib/fontawsome/icons'
@@ -21,21 +21,28 @@ export function BoardBody() {
     {
       id: 1,
       title: '待辦事項',
+      todos: [
+        {
+          id: 1,
+          title: '切版',
+        },
+      ],
     },
     {
       id: 2,
       title: '進行中',
+      todos: [],
     },
     {
       id: 3,
       title: '已完成',
+      todos: [],
     },
   ])
-  const inputRef = useRef()
 
   function addNewList(e) {
     e.preventDefault()
-    const { value } = inputRef.current
+    const value = e.target.elements['listTitle'].value
     if (value === '') return
 
     setStatusLists((prev) => [
@@ -43,20 +50,16 @@ export function BoardBody() {
       {
         id: Date.now(),
         title: value,
+        todos: [],
       },
     ])
-    inputRef.current.value = ''
+    e.target.reset()
   }
 
   return (
     <ContentContainer>
       {statusLists.map((list) => (
-        <StatusCard
-          key={list.id}
-          id={list.id}
-          cardTitle={list.title}
-          setStatusLists={setStatusLists}
-        />
+        <StatusCard key={list.id} list={list} setStatusLists={setStatusLists} />
       ))}
       {isOpen ? (
         <form
@@ -71,13 +74,13 @@ export function BoardBody() {
             `,
             tw`space-y-[4px]`,
           ]}
-          onClick={addNewList}
+          onSubmit={addNewList}
         >
           <input
+            name="listTitle"
             css={tw`w-full px-[8px] py-[6px] border-sky-600 border-2 rounded-sm text-sm focus:outline-none`}
             type="text"
             placeholder="為列表輸入標題..."
-            ref={inputRef}
             autoFocus
           />
           <div css={tw`flex items-center space-x-4`}>
