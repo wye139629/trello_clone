@@ -4,12 +4,12 @@ import { useState } from 'react'
 import { StatusCard } from './StatusCard'
 import { Icon } from 'components/shared'
 import { faPlus, faTimes } from 'lib/fontawsome/icons'
+import { useTaskReducer } from 'context/taskContext'
 
 const ContentContainer = styled.div(() => [
   css`
     height: calc(100% - 52px);
     display: flex;
-    overflow-x: scroll;
     padding: 0 10px;
   `,
   tw`space-x-[8px]`,
@@ -17,49 +17,31 @@ const ContentContainer = styled.div(() => [
 
 export function BoardBody() {
   const [isOpen, setIsOpen] = useState(false)
-  const [statusLists, setStatusLists] = useState([
-    {
-      id: 1,
-      title: '待辦事項',
-      todos: [
-        {
-          id: 1,
-          title: '切版',
-        },
-      ],
-    },
-    {
-      id: 2,
-      title: '進行中',
-      todos: [],
-    },
-    {
-      id: 3,
-      title: '已完成',
-      todos: [],
-    },
-  ])
+  const [taskState, taskDispatch] = useTaskReducer()
+  const { lists, listOrder, todos } = taskState
 
   function addNewList(e) {
     e.preventDefault()
     const value = e.target.elements['listTitle'].value
     if (value === '') return
 
-    setStatusLists((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        title: value,
-        todos: [],
-      },
-    ])
+    taskDispatch({
+      type: 'ADD_LIST',
+      payload: { id: `list-${Date.now()}`, title: value, todoIds: [] },
+    })
+
     e.target.reset()
   }
 
   return (
     <ContentContainer>
-      {statusLists.map((list) => (
-        <StatusCard key={list.id} list={list} setStatusLists={setStatusLists} />
+      {listOrder.map((listId) => (
+        <StatusCard
+          key={listId}
+          list={lists[listId]}
+          todos={todos}
+          taskDispatch={taskDispatch}
+        />
       ))}
       {isOpen ? (
         <form

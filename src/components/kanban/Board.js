@@ -3,6 +3,7 @@ import tw, { css, styled } from 'twin.macro'
 import PropTypes from 'prop-types'
 import { BoardHeader } from './BoardHeader'
 import { BoardBody } from './BoardBody'
+import { TaskCtxProvider } from 'context/taskContext'
 
 const BoardContainer = styled.div(({ isOpen }) => [
   tw`pl-6 w-screen`,
@@ -21,7 +22,9 @@ function Board({ isOpen }) {
   return (
     <BoardContainer isOpen={isOpen}>
       <BoardHeader></BoardHeader>
-      <BoardBody></BoardBody>
+      <TaskCtxProvider>
+        <BoardBody></BoardBody>
+      </TaskCtxProvider>
     </BoardContainer>
   )
 }

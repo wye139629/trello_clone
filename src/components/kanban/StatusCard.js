@@ -5,6 +5,7 @@ import { Switcher, Displayer, Editor } from '../shared'
 import { AddButton } from './AddButton'
 import { Icon } from 'components/shared'
 import { faTimes } from 'lib/fontawsome/icons'
+import { TodoItem } from './TodoItem'
 import PropTypes from 'prop-types'
 
 const StatusCardWraper = styled.div`
@@ -22,11 +23,12 @@ const CardContainer = styled.div`
 
 StatusCard.propTypes = {
   list: PropTypes.object.isRequired,
-  setStatusLists: PropTypes.func.isRequired,
+  todos: PropTypes.object.isRequired,
+  taskDispatch: PropTypes.func.isRequired,
 }
 
-export function StatusCard({ list, setStatusLists }) {
-  const { id, title: cardTitle, todos } = list
+export function StatusCard({ list, todos, taskDispatch }) {
+  const { id, title: cardTitle, todoIds } = list
   const [isAdding, setIsAdding] = useState(false)
   const textareaRef = useRef()
 
@@ -35,19 +37,13 @@ export function StatusCard({ list, setStatusLists }) {
 
     if (editor.value === '') {
       editor.value = cardTitle
-      updateStatusList(cardTitle)
-      return
+      return updateStatusList(cardTitle)
     }
 
     updateStatusList(editor.value)
 
     function updateStatusList(value) {
-      setStatusLists((prev) => {
-        const nextStatusList = [...prev]
-        const onChangingCard = nextStatusList.find((list) => list.id === id)
-        onChangingCard.title = value
-        return nextStatusList
-      })
+      taskDispatch({ type: 'EDIT_LIST_TITLE', payload: { id, title: value } })
     }
   }
 
@@ -56,18 +52,9 @@ export function StatusCard({ list, setStatusLists }) {
     const textareaEl = e.target.elements['todoTitle']
     const { value, style } = textareaEl
 
-    setStatusLists((prev) => {
-      const nextStatusList = [...prev]
-      const onChangingCard = nextStatusList.find((list) => list.id === id)
-      const nextTodos = [
-        ...onChangingCard.todos,
-        {
-          id: Date.now(),
-          title: value,
-        },
-      ]
-      onChangingCard.todos = nextTodos
-      return nextStatusList
+    taskDispatch({
+      type: 'ADD_TODO',
+      payload: { listId: id, todo: { id: `todo-${Date.now()}`, title: value } },
     })
 
     style.height = '54px'
@@ -103,13 +90,8 @@ export function StatusCard({ list, setStatusLists }) {
         <div
           css={tw`px-[8px] pb-[8px] space-y-[8px] overflow-y-auto max-h-[770px]`}
         >
-          {todos.map((item) => (
-            <div
-              key={item.id}
-              css={tw`px-[8px] py-[6px] text-sm cursor-pointer rounded shadow-md overflow-hidden break-words bg-white hover:bg-white/50`}
-            >
-              {item.title}
-            </div>
+          {todoIds.map((todoId, idx) => (
+            <TodoItem key={todoId} todo={todos[todoId]} idx={idx} />
           ))}
           {isAdding ? (
             <form onSubmit={addNewTodo}>
