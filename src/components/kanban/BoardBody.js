@@ -11,6 +11,8 @@ const ContentContainer = styled.div(() => [
     height: calc(100% - 52px);
     display: flex;
     padding: 0 10px;
+    overflow: auto;
+    align-items: start;
   `,
   tw`space-x-[8px]`,
 ])
