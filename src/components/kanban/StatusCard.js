@@ -7,6 +7,7 @@ import { Icon } from 'components/shared'
 import { faTimes } from 'lib/fontawsome/icons'
 import { TodoItem } from './TodoItem'
 import PropTypes from 'prop-types'
+import { useDrop } from 'react-dnd'
 
 const StatusCardWraper = styled.div`
   width: 272px;
@@ -28,6 +29,27 @@ StatusCard.propTypes = {
 }
 
 export function StatusCard({ list, todos, taskDispatch }) {
+  const [, drop] = useDrop(
+    () => ({
+      accept: 'todo',
+      hover(item) {
+        if (item.status === list.id) return
+        if (list.todoIds.length > 0) return
+
+        taskDispatch({
+          type: 'DROP_TODO_TO_EMPETY',
+          payload: { todo: item, targetListId: list.id },
+        })
+        item.status = list.id
+      },
+      collect: (monitor) => {
+        return {
+          isOver: !!monitor.isOver(),
+        }
+      },
+    }),
+    [list]
+  )
   const { id, title: cardTitle, todoIds } = list
   const [isAdding, setIsAdding] = useState(false)
   const textareaRef = useRef()
@@ -88,10 +110,16 @@ export function StatusCard({ list, todos, taskDispatch }) {
           </Switcher>
         </div>
         <div
+          ref={drop}
           css={tw`px-[8px] pb-[8px] space-y-[8px] overflow-y-auto max-h-[770px]`}
         >
           {todoIds.map((todoId, idx) => (
-            <TodoItem key={todoId} todo={todos[todoId]} idx={idx} />
+            <TodoItem
+              key={todoId}
+              todo={todos[todoId]}
+              idx={idx}
+              taskDispatch={taskDispatch}
+            />
           ))}
           {isAdding ? (
             <form onSubmit={addNewTodo}>

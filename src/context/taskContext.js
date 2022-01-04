@@ -52,8 +52,83 @@ function taskReducer(prevState, action) {
     case 'DRAG_LIST': {
       return
     }
-    case 'DRAG_TODO': {
-      return
+    case 'DRAG_TODO_TO_SAME_LIST': {
+      const { dragTodo, hoverTodo } = action.payload
+      const targetListId = hoverTodo.status
+      const prevTargetList = prevState.lists[targetListId]
+      const nextTodoIds = [...prevTargetList.todoIds]
+      const dragIdx = nextTodoIds.indexOf(dragTodo.id)
+      const targetIdx = nextTodoIds.indexOf(hoverTodo.id)
+      nextTodoIds.splice(dragIdx, 1)
+      nextTodoIds.splice(targetIdx, 0, dragTodo.id)
+
+      return {
+        ...prevState,
+        lists: {
+          ...prevState.lists,
+          [targetListId]: {
+            ...prevTargetList,
+            todoIds: nextTodoIds,
+          },
+        },
+      }
+    }
+    case 'DRAG_TODO_TO_OTHER_LIST': {
+      const { dragTodo, hoverTodo } = action.payload
+      const targetListId = hoverTodo.status
+      const originListId = dragTodo.status
+      const dragIdx = prevState.lists[originListId].todoIds.indexOf(dragTodo.id)
+      const targetIdx = prevState.lists[targetListId].todoIds.indexOf(
+        hoverTodo.id
+      )
+      const nextOriginList = { ...prevState.lists[originListId] }
+      const nextTargetList = { ...prevState.lists[targetListId] }
+
+      nextOriginList.todoIds.splice(dragIdx, 1)
+      nextTargetList.todoIds.splice(targetIdx, 0, dragTodo.id)
+
+      return {
+        ...prevState,
+        lists: {
+          ...prevState.lists,
+          [originListId]: nextOriginList,
+          [targetListId]: nextTargetList,
+        },
+        todos: {
+          ...prevState.todos,
+          [dragTodo.id]: {
+            ...prevState.todos[dragTodo.id],
+            status: hoverTodo.status,
+          },
+        },
+      }
+    }
+    case 'DROP_TODO_TO_EMPETY': {
+      const dragTodo = action.payload.todo
+      const originListId = dragTodo.status
+      const targetListId = action.payload.targetListId
+      const dragIdx = prevState.lists[originListId].todoIds.indexOf(dragTodo.id)
+      const nextOriginList = { ...prevState.lists[originListId] }
+      nextOriginList.todoIds.splice(dragIdx, 1)
+
+      return {
+        ...prevState,
+        lists: {
+          ...prevState.lists,
+          [originListId]: nextOriginList,
+          [targetListId]: {
+            ...prevState.lists[targetListId],
+            todoIds: [dragTodo.id],
+          },
+        },
+        todos: {
+          ...prevState.todos,
+          [dragTodo.id]: {
+            ...prevState.todos[dragTodo.id],
+            status: targetListId,
+          },
+        },
+      }
     }
     default:
       throw new Error(`Sorry, there is no ${action.type} type in taskReducer`)
@@ -83,22 +158,27 @@ const initialState = {
     'todo-1': {
       id: 'todo-1',
       title: 'nav切版',
+      status: 'list-1',
     },
     'todo-2': {
       id: 'todo-2',
       title: '串 api',
+      status: 'list-1',
     },
     'todo-3': {
       id: 'todo-3',
       title: 'kanban 切版',
+      status: 'list-2',
     },
     'todo-4': {
       id: 'todo-4',
       title: 'todo 拖拉',
+      status: 'list-1',
     },
     'todo-5': {
       id: 'todo-5',
       title: 'list 拖拉',
+      status: 'list-3',
     },
   },
 }
