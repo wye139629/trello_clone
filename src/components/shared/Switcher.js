@@ -68,7 +68,7 @@ function Editor({ children: child }) {
   useLayoutEffect(() => {
     if (!isEdit) return
     editorRef.current.focus()
-  }, [isEdit])
+  }, [isEdit, editorRef])
 
   useImperativeHandle(child.ref, () => ({
     editor: editorRef.current,
