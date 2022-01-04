@@ -130,6 +130,18 @@ function taskReducer(prevState, action) {
         },
       }
     }
+    case 'TOGGLE_TODO_DRAGGING': {
+      const { todoId, isDragging } = action.payload
+      const nextTodo = { ...prevState.todos[todoId], isDragging }
+
+      return {
+        ...prevState,
+        todos: {
+          ...prevState.todos,
+          [todoId]: nextTodo,
+        },
+      }
+    }
     default:
       throw new Error(`Sorry, there is no ${action.type} type in taskReducer`)
   }
@@ -159,26 +171,31 @@ const initialState = {
       id: 'todo-1',
       title: 'nav切版',
       status: 'list-1',
+      isDragging: false,
     },
     'todo-2': {
       id: 'todo-2',
       title: '串 api',
       status: 'list-1',
+      isDragging: false,
     },
     'todo-3': {
       id: 'todo-3',
       title: 'kanban 切版',
       status: 'list-2',
+      isDragging: false,
     },
     'todo-4': {
       id: 'todo-4',
       title: 'todo 拖拉',
       status: 'list-1',
+      isDragging: false,
     },
     'todo-5': {
       id: 'todo-5',
       title: 'list 拖拉',
       status: 'list-3',
+      isDragging: false,
     },
   },
 }

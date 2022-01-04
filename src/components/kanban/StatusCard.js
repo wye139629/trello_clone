@@ -76,7 +76,15 @@ export function StatusCard({ list, todos, taskDispatch }) {
 
     taskDispatch({
       type: 'ADD_TODO',
-      payload: { listId: id, todo: { id: `todo-${Date.now()}`, title: value } },
+      payload: {
+        listId: id,
+        todo: {
+          id: `todo-${Date.now()}`,
+          title: value,
+          status: id,
+          isDraging: false,
+        },
+      },
     })
 
     style.height = '54px'

@@ -7,6 +7,7 @@ import { faPlus, faTimes } from 'lib/fontawsome/icons'
 import { useTaskReducer } from 'context/taskContext'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+import CustomDragLayer from '../shared/CustomDragLayer'
 
 const ContentContainer = styled.div(() => [
   css`
@@ -39,6 +40,7 @@ export function BoardBody() {
 
   return (
     <DndProvider backend={HTML5Backend}>
+      <CustomDragLayer />
       <ContentContainer>
         {listOrder.map((listId) => (
           <StatusCard

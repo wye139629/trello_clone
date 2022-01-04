@@ -2,11 +2,11 @@ import tw from 'twin.macro'
 
 import PropTypes from 'prop-types'
 import { useDrag, useDrop } from 'react-dnd'
-import { useRef } from 'react'
+import { getEmptyImage } from 'react-dnd-html5-backend'
+import { useEffect, useRef } from 'react'
 
 TodoItem.propTypes = {
   todo: PropTypes.object.isRequired,
-  idx: PropTypes.number.isRequired,
   taskDispatch: PropTypes.func.isRequired,
 }
 
@@ -46,16 +46,38 @@ export function TodoItem({ todo, taskDispatch }) {
     [todo]
   )
 
-  const [, drag] = useDrag(() => ({
-    type: 'todo',
-    item: () => {
-      return { ...todo }
-    },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
+  const [{ isDragging }, drag, preview] = useDrag(
+    () => ({
+      type: 'todo',
+      item: () => {
+        return { ...todo }
+      },
+      collect: (monitor) => ({
+        isDragging: !!monitor.isDragging(),
+      }),
+      end(item) {
+        taskDispatch({
+          type: 'TOGGLE_TODO_DRAGGING',
+          payload: { todoId: item.id, isDragging: false },
+        })
+      },
     }),
-  }))
-  const { title } = todo
+    [todo]
+  )
+  const { title, isDragging: isTodoDragging } = todo
+
+  useEffect(() => {
+    preview(getEmptyImage(), { captureDraggingState: true })
+  }, [preview])
+
+  useEffect(() => {
+    if (!isDragging) return
+
+    taskDispatch({
+      type: 'TOGGLE_TODO_DRAGGING',
+      payload: { todoId: todo.id, isDragging: true },
+    })
+  }, [isDragging])
 
   drag(todoRef)
   drop(todoRef)
@@ -64,6 +86,7 @@ export function TodoItem({ todo, taskDispatch }) {
       ref={todoRef}
       css={[
         tw`px-[8px] py-[6px] text-sm cursor-pointer rounded shadow-md overflow-hidden break-words bg-white hover:bg-white/50`,
+        isTodoDragging ? tw`!bg-gray-300 !text-gray-300` : '',
       ]}
       data-handler-id={handlerId}
     >
