@@ -44,10 +44,36 @@ function taskReducer(prevState, action) {
       }
     }
     case 'EDIT_TODO': {
-      return
+      const { todoId, title } = action.payload
+      return {
+        ...prevState,
+        todos: {
+          ...prevState.todos,
+          [todoId]: {
+            ...prevState.todos[todoId],
+            title,
+          },
+        },
+      }
     }
     case 'REMOVE_TODO': {
-      return
+      const { todoId, listId } = action.payload
+      const nextList = { ...prevState.lists[listId] }
+      const nextTodos = { ...prevState.todos }
+      const todoIdx = nextList.todoIds.indexOf(todoId)
+      nextList.todoIds.splice(todoIdx, 1)
+      delete nextTodos[todoId]
+
+      return {
+        ...prevState,
+        lists: {
+          ...prevState.lists,
+          [listId]: nextList,
+        },
+        todos: {
+          ...nextTodos,
+        },
+      }
     }
     case 'DRAG_LIST': {
       return

@@ -10,6 +10,9 @@ import PropTypes from 'prop-types'
 
 const Dialog = styled(ReachDialog)({
   position: 'relative',
+  borderRadius: '3px',
+  padding: '10px 45px 10px 12px',
+  width: '768px',
 })
 
 const ModalCtx = createContext()
@@ -41,7 +44,10 @@ function ModalContentsBase(props) {
 }
 
 ModalContent.propTypes = {
-  children: PropTypes.arrayOf(PropTypes.element).isRequired,
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node,
+  ]).isRequired,
 }
 
 function ModalContent({ children, ...props }) {
@@ -49,7 +55,7 @@ function ModalContent({ children, ...props }) {
     <ModalContentsBase {...props}>
       <ModalDismissBtn>
         <button
-          css={tw`absolute top-2 right-2 w-[25px] h-[25px] rounded-full focus:outline-none hover:bg-gray-200`}
+          css={tw`absolute top-2 right-2 w-[25px] h-[25px] rounded-full text-gray-500 focus:outline-none hover:bg-gray-200`}
         >
           <Icon name={faTimes}></Icon>
         </button>
