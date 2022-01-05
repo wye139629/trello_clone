@@ -5,7 +5,7 @@ module.exports = {
   testMatch: ['**/__tests__/**/*.js'],
   testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
-    '\\.scss$': 'identity-obj-proxy',
+    '\\.(scss|css)$': 'identity-obj-proxy',
   },
   moduleDirectories: [
     'node_modules',

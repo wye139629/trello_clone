@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { useDrag, useDrop } from 'react-dnd'
 import { getEmptyImage } from 'react-dnd-html5-backend'
 import { useEffect, useRef } from 'react'
+import { Modal, ModalContent, ModalOpenBtn } from '../shared/Modal'
 
 TodoItem.propTypes = {
   todo: PropTypes.object.isRequired,
@@ -82,15 +83,20 @@ export function TodoItem({ todo, taskDispatch }) {
   drag(todoRef)
   drop(todoRef)
   return (
-    <div
-      ref={todoRef}
-      css={[
-        tw`px-[8px] py-[6px] text-sm cursor-pointer rounded shadow-md overflow-hidden break-words bg-white hover:bg-white/50`,
-        isTodoDragging ? tw`!bg-gray-300 !text-gray-300` : '',
-      ]}
-      data-handler-id={handlerId}
-    >
-      {title}
-    </div>
+    <Modal>
+      <ModalOpenBtn>
+        <div
+          ref={todoRef}
+          css={[
+            tw`px-[8px] py-[6px] text-sm cursor-pointer rounded shadow-md overflow-hidden break-words bg-white hover:bg-white/50`,
+            isTodoDragging ? tw`!bg-gray-300 !text-gray-300` : '',
+          ]}
+          data-handler-id={handlerId}
+        >
+          <button>{title}</button>
+        </div>
+      </ModalOpenBtn>
+      <ModalContent></ModalContent>
+    </Modal>
   )
 }

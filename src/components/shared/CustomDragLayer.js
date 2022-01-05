@@ -46,4 +46,4 @@ const CustomDragLayer = () => {
     </div>
   )
 }
-export default CustomDragLayer
+export { CustomDragLayer }

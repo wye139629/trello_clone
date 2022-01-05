@@ -2,12 +2,11 @@ import tw, { css, styled } from 'twin.macro'
 
 import { useState } from 'react'
 import { StatusCard } from './StatusCard'
-import { Icon } from 'components/shared'
+import { Icon, CustomDragLayer } from 'components/shared'
 import { faPlus, faTimes } from 'lib/fontawsome/icons'
 import { useTaskReducer } from 'context/taskContext'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import CustomDragLayer from '../shared/CustomDragLayer'
 
 const ContentContainer = styled.div(() => [
   css`
