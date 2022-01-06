@@ -25,7 +25,26 @@ function taskReducer(prevState, action) {
       }
     }
     case 'REMOVE_LIST': {
-      return
+      const { listId } = action.payload
+      const listIndex = prevState.listOrder.indexOf(listId)
+      const originListTodoIds = prevState.lists[listId].todoIds
+      const nextLists = { ...prevState.lists }
+      const nextTodos = { ...prevState.todos }
+      const nextListOrder = [...prevState.listOrder]
+
+      delete nextLists[listId]
+
+      originListTodoIds.forEach((todoId) => {
+        delete nextTodos[todoId]
+      })
+
+      nextListOrder.splice(listIndex, 1)
+      return {
+        ...prevState,
+        lists: nextLists,
+        todos: nextTodos,
+        listOrder: nextListOrder,
+      }
     }
     case 'ADD_TODO': {
       const { listId, todo: nextTodo } = action.payload
