@@ -3,16 +3,9 @@ import tw from 'twin.macro'
 import PropTypes from 'prop-types'
 import { useDrag, useDrop } from 'react-dnd'
 import { getEmptyImage } from 'react-dnd-html5-backend'
-import { useState, useEffect, useRef } from 'react'
-import {
-  Modal,
-  ModalContent,
-  ModalOpenBtn,
-  ModalDismissBtn,
-  Switcher,
-  Displayer,
-  Editor,
-} from '../shared'
+import { useEffect, useRef } from 'react'
+import { Modal, ModalContent, ModalOpenBtn } from '../shared'
+import { TodoInfoPanel } from './TodoInfoPanel'
 
 TodoItem.propTypes = {
   todo: PropTypes.object.isRequired,
@@ -108,70 +101,5 @@ export function TodoItem({ todo, taskDispatch }) {
         <TodoInfoPanel todo={todo} taskDispatch={taskDispatch} />
       </ModalContent>
     </Modal>
-  )
-}
-
-TodoInfoPanel.propTypes = {
-  todo: PropTypes.object.isRequired,
-  taskDispatch: PropTypes.func.isRequired,
-}
-
-function TodoInfoPanel({ todo, taskDispatch }) {
-  const { id, title, status } = todo
-  const [editingTitle, setEditingTitle] = useState(title)
-
-  return (
-    <>
-      <div>
-        <div css={tw`text-sky-900`}>
-          <Switcher>
-            <Displayer>
-              <h4 css={tw`break-words px-[10px] py-[4px]`}>{editingTitle}</h4>
-            </Displayer>
-            <Editor>
-              <textarea
-                defaultValue={title}
-                css={tw`resize-none break-words px-[10px] py-[4px]`}
-                onChange={(e) => setEditingTitle(e.target.value)}
-                onBlur={(e) => {
-                  taskDispatch({
-                    type: 'EDIT_TODO',
-                    payload: { todoId: id, title: e.target.value },
-                  })
-                }}
-              />
-            </Editor>
-          </Switcher>
-        </div>
-        <span css={tw`px-[10px] text-sm text-gray-500`}>
-          在「{status}」列表中
-        </span>
-      </div>
-      <div css={tw`flex`}>
-        <div css={tw`px-[10px]`}>
-          <h4>描述</h4>
-          <form>
-            <textarea></textarea>
-            <button>儲存</button>
-          </form>
-        </div>
-        <div css={tw`ml-auto`}>
-          <h4>其他</h4>
-          <ModalDismissBtn>
-            <button
-              css={tw`text-red-500`}
-              onClick={() =>
-                taskDispatch({
-                  type: 'REMOVE_TODO',
-                  payload: { todoId: id, listId: status },
-                })
-              }
-            >
-              刪除
-            </button>
-          </ModalDismissBtn>
-        </div>
-      </div>
-    </>
   )
 }

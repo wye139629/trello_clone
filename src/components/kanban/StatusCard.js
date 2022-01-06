@@ -82,6 +82,7 @@ export function StatusCard({ list, todos, taskDispatch }) {
           id: `todo-${Date.now()}`,
           title: value,
           status: id,
+          description: '',
           isDraging: false,
         },
       },

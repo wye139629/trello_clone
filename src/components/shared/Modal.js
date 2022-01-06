@@ -13,6 +13,7 @@ const Dialog = styled(ReachDialog)({
   borderRadius: '3px',
   padding: '10px 45px 10px 12px',
   width: '768px',
+  backgroundColor: '#f4f5f7',
 })
 
 const ModalCtx = createContext()

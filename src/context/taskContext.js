@@ -44,14 +44,15 @@ function taskReducer(prevState, action) {
       }
     }
     case 'EDIT_TODO': {
-      const { todoId, title } = action.payload
+      const { todo } = action.payload
+      const todoId = todo.id
       return {
         ...prevState,
         todos: {
           ...prevState.todos,
           [todoId]: {
             ...prevState.todos[todoId],
-            title,
+            ...todo,
           },
         },
       }
@@ -197,30 +198,35 @@ const initialState = {
       id: 'todo-1',
       title: 'nav切版',
       status: 'list-1',
+      description: '',
       isDragging: false,
     },
     'todo-2': {
       id: 'todo-2',
       title: '串 api',
       status: 'list-1',
+      description: '',
       isDragging: false,
     },
     'todo-3': {
       id: 'todo-3',
       title: 'kanban 切版',
       status: 'list-2',
+      description: '',
       isDragging: false,
     },
     'todo-4': {
       id: 'todo-4',
       title: 'todo 拖拉',
       status: 'list-1',
+      description: '',
       isDragging: false,
     },
     'todo-5': {
       id: 'todo-5',
       title: 'list 拖拉',
       status: 'list-3',
+      description: '',
       isDragging: false,
     },
   },
