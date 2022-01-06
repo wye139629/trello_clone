@@ -28,6 +28,7 @@
     "@fortawesome/free-regular-svg-icons": "^5.15.4",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.16",
+    "@reach/dialog": "^0.16.2",
     "cross-env": "^7.0.3",
     "react": "^17.0.2",
     "react-dnd": "^14.0.4",

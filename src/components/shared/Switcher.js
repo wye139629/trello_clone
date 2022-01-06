@@ -10,6 +10,7 @@ import {
   cloneElement,
   useImperativeHandle,
 } from 'react'
+import { callAll } from 'lib/callAll'
 import PropTypes from 'prop-types'
 
 Switcher.propTypes = {
@@ -17,12 +18,6 @@ Switcher.propTypes = {
 }
 
 const SwitcherCtx = createContext()
-
-function callAll(...callbacks) {
-  return (...args) => {
-    callbacks.forEach((func) => func && func(...args))
-  }
-}
 
 function Switcher({ children, ...props }) {
   const [isEdit, setIsEdit] = useState(false)
