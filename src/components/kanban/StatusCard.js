@@ -6,6 +6,7 @@ import { Switcher, Displayer, Editor } from '../shared'
 import { AddButton } from './AddButton'
 import { Icon } from 'components/shared'
 import { faTimes, faEllipsisH } from 'lib/fontawsome/icons'
+import { useClickOutSide } from 'lib/hooks/useClickOutSide'
 import { TodoItem } from './TodoItem'
 import PropTypes from 'prop-types'
 import { useDrag, useDrop } from 'react-dnd'
@@ -107,6 +108,8 @@ export function StatusCard({ list, todos, taskDispatch }) {
   const textareaRef = useRef()
   const cardListRef = useRef()
   const todosWrapperRef = useRef()
+  const addTodoFormRef = useRef()
+  useClickOutSide(addTodoFormRef, () => setIsAdding(false))
 
   useEffect(() => {
     preview(getEmptyImage(), { captureDraggingState: true })
@@ -229,7 +232,7 @@ export function StatusCard({ list, todos, taskDispatch }) {
             />
           ))}
           {isAdding ? (
-            <form onSubmit={addNewTodo}>
+            <form ref={addTodoFormRef} onSubmit={addNewTodo}>
               <div
                 css={tw`px-[8px] py-[6px] mb-[8px] bg-white rounded shadow-md`}
               >

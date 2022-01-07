@@ -6,6 +6,7 @@ import { Icon } from 'components/shared'
 import { faPlus, faTimes } from 'lib/fontawsome/icons'
 import { useTaskReducer } from 'context/taskContext'
 import { useDrop } from 'react-dnd'
+import { useClickOutSide } from 'lib/hooks/useClickOutSide'
 
 const ContentContainer = styled.div(() => [
   css`
@@ -27,6 +28,8 @@ export function BoardBody() {
   const [taskState, taskDispatch] = useTaskReducer()
   const { lists, listOrder, todos } = taskState
   const boardContentRef = useRef()
+  const addListFormRef = useRef()
+  useClickOutSide(addListFormRef, () => setIsOpen(false))
 
   useLayoutEffect(() => {
     const { current: boardContentEl } = boardContentRef
@@ -62,15 +65,11 @@ export function BoardBody() {
         <form
           css={[
             css`
-              background-color: rgba(235, 236, 240);
-              align-self: start;
-              width: 270px;
-              padding: 4px;
-              border-radius: 4px;
               flex-shrink: 0;
             `,
-            tw`space-y-[4px]`,
+            tw`space-y-[4px] bg-listGray w-[270px] p-[4px] rounded-[4px] self-start`,
           ]}
+          ref={addListFormRef}
           onSubmit={addNewList}
         >
           <input
