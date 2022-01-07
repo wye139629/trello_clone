@@ -103,6 +103,7 @@ export function StatusCard({ list, todos, taskDispatch }) {
   )
   const { id, title: cardTitle, todoIds } = list
   const [isAdding, setIsAdding] = useState(false)
+  const addTodoBtnRef = useRef()
   const textareaRef = useRef()
   const cardListRef = useRef()
   const todosWrapperRef = useRef()
@@ -242,7 +243,10 @@ export function StatusCard({ list, todos, taskDispatch }) {
                     e.target.style.height = `${e.target.scrollHeight}px`
                   }}
                   onKeyDown={(e) => {
-                    if (e.keyCode === 13) return e.preventDefault()
+                    if (e.keyCode === 13) {
+                      e.preventDefault()
+                      addTodoBtnRef.current.click()
+                    }
                   }}
                   autoFocus
                 />
@@ -250,7 +254,7 @@ export function StatusCard({ list, todos, taskDispatch }) {
               <div css={tw`flex items-center space-x-4`}>
                 <button
                   css={tw`bg-sky-600 text-white text-sm px-[12px] py-[6px] rounded`}
-                  type="submit"
+                  ref={addTodoBtnRef}
                 >
                   新增卡片
                 </button>
