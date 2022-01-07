@@ -25,7 +25,26 @@ function taskReducer(prevState, action) {
       }
     }
     case 'REMOVE_LIST': {
-      return
+      const { listId } = action.payload
+      const listIndex = prevState.listOrder.indexOf(listId)
+      const originListTodoIds = prevState.lists[listId].todoIds
+      const nextLists = { ...prevState.lists }
+      const nextTodos = { ...prevState.todos }
+      const nextListOrder = [...prevState.listOrder]
+
+      delete nextLists[listId]
+
+      originListTodoIds.forEach((todoId) => {
+        delete nextTodos[todoId]
+      })
+
+      nextListOrder.splice(listIndex, 1)
+      return {
+        ...prevState,
+        lists: nextLists,
+        todos: nextTodos,
+        listOrder: nextListOrder,
+      }
     }
     case 'ADD_TODO': {
       const { listId, todo: nextTodo } = action.payload
@@ -77,7 +96,17 @@ function taskReducer(prevState, action) {
       }
     }
     case 'DRAG_LIST': {
-      return
+      const { dragList, hoverList } = action.payload
+      const dragListIndex = prevState.listOrder.indexOf(dragList.id)
+      const hoverListIndex = prevState.listOrder.indexOf(hoverList.id)
+      const nextListOrder = [...prevState.listOrder]
+      nextListOrder.splice(dragListIndex, 1)
+      nextListOrder.splice(hoverListIndex, 0, dragList.id)
+
+      return {
+        ...prevState,
+        listOrder: nextListOrder,
+      }
     }
     case 'DRAG_TODO_TO_SAME_LIST': {
       const { dragTodo, hoverTodo } = action.payload
