@@ -1,7 +1,7 @@
 import tw, { css, styled } from 'twin.macro'
 
 import '@reach/menu-button/styles.css'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useLayoutEffect, useEffect, useRef } from 'react'
 import { Switcher, Displayer, Editor } from '../shared'
 import { AddButton } from './AddButton'
 import { Icon } from 'components/shared'
@@ -105,10 +105,18 @@ export function StatusCard({ list, todos, taskDispatch }) {
   const [isAdding, setIsAdding] = useState(false)
   const textareaRef = useRef()
   const cardListRef = useRef()
+  const todosWrapperRef = useRef()
 
   useEffect(() => {
     preview(getEmptyImage(), { captureDraggingState: true })
   }, [preview])
+
+  useLayoutEffect(() => {
+    if (!isAdding) return
+
+    const { current: box } = todosWrapperRef
+    box.scrollTop = box.scrollHeight
+  }, [todos, isAdding])
 
   function changeCardTitle() {
     const { editor } = textareaRef.current
@@ -148,6 +156,7 @@ export function StatusCard({ list, todos, taskDispatch }) {
     e.target.reset()
   }
 
+  drop(todosWrapperRef)
   drag(cardListRef)
   listDrop(cardListRef)
 
@@ -202,7 +211,7 @@ export function StatusCard({ list, todos, taskDispatch }) {
           </Menu>
         </div>
         <div
-          ref={drop}
+          ref={todosWrapperRef}
           css={[
             tw`px-[8px] pb-[8px] space-y-[8px] overflow-y-auto`,
             css`
@@ -256,7 +265,7 @@ export function StatusCard({ list, todos, taskDispatch }) {
         </div>
         {isAdding ? null : (
           <div css={tw`px-[8px] pb-[8px]`}>
-            <AddButton text={'新增卡片'} onClick={() => setIsAdding(true)} />
+            <AddButton text="新增卡片" onClick={() => setIsAdding(true)} />
           </div>
         )}
       </CardContainer>

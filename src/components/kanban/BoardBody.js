@@ -1,6 +1,6 @@
 import tw, { css, styled } from 'twin.macro'
 
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { StatusCard } from './StatusCard'
 import { Icon } from 'components/shared'
 import { faPlus, faTimes } from 'lib/fontawsome/icons'
@@ -26,6 +26,12 @@ export function BoardBody() {
   const [isOpen, setIsOpen] = useState(false)
   const [taskState, taskDispatch] = useTaskReducer()
   const { lists, listOrder, todos } = taskState
+  const boardContentRef = useRef()
+
+  useLayoutEffect(() => {
+    const { current: boardContentEl } = boardContentRef
+    boardContentEl.scrollLeft = boardContentEl.scrollWidth
+  }, [isOpen, lists])
 
   function addNewList(e) {
     e.preventDefault()
@@ -40,8 +46,10 @@ export function BoardBody() {
     e.target.reset()
   }
 
+  drop(boardContentRef)
+
   return (
-    <ContentContainer ref={drop}>
+    <ContentContainer ref={boardContentRef}>
       {listOrder.map((listId) => (
         <StatusCard
           key={listId}
