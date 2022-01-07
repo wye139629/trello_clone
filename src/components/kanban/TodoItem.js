@@ -83,6 +83,7 @@ export function TodoItem({ todo, taskDispatch }) {
 
   drag(todoRef)
   drop(todoRef)
+
   return (
     <Modal>
       <ModalOpenBtn>

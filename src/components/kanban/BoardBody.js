@@ -9,13 +9,9 @@ import { useDrop } from 'react-dnd'
 
 const ContentContainer = styled.div(() => [
   css`
-    height: calc(100% - 52px);
-    display: flex;
-    padding: 0 10px;
-    overflow: auto;
-    align-items: start;
+    height: calc(100vh - 104px);
   `,
-  tw`space-x-[8px]`,
+  tw`flex p-[10px] items-start space-x-[8px] overflow-x-auto overflow-y-hidden`,
 ])
 
 export function BoardBody() {

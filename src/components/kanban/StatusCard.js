@@ -1,4 +1,4 @@
-import tw, { styled } from 'twin.macro'
+import tw, { css, styled } from 'twin.macro'
 
 import '@reach/menu-button/styles.css'
 import { useState, useEffect, useRef } from 'react'
@@ -32,7 +32,6 @@ const CardContainer = styled.div`
   max-height: 100%;
   border-radius: 4px;
   background-color: rgba(235, 236, 240);
-  position: relative;
   ${({ isDragging }) => isDragging && tw`opacity-0`}
 `
 
@@ -204,7 +203,12 @@ export function StatusCard({ list, todos, taskDispatch }) {
         </div>
         <div
           ref={drop}
-          css={tw`px-[8px] pb-[8px] space-y-[8px] overflow-y-auto max-h-[770px]`}
+          css={[
+            tw`px-[8px] pb-[8px] space-y-[8px] overflow-y-auto`,
+            css`
+              max-height: calc(100vh - 204px);
+            `,
+          ]}
         >
           {todoIds.map((todoId, idx) => (
             <TodoItem
