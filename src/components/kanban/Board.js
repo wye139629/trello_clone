@@ -13,7 +13,6 @@ const BoardContainer = styled.div(({ isOpen }) => [
   isOpen &&
     css`
       width: calc(100vw - 260px);
-      transition: width 0.5s;
     `,
 ])
 

@@ -1,11 +1,12 @@
-import tw, { styled } from 'twin.macro'
+import tw, { css, styled } from 'twin.macro'
 
 import '@reach/menu-button/styles.css'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useLayoutEffect, useEffect, useRef } from 'react'
 import { Switcher, Displayer, Editor } from '../shared'
 import { AddButton } from './AddButton'
 import { Icon } from 'components/shared'
 import { faTimes, faEllipsisH } from 'lib/fontawsome/icons'
+import { useClickOutSide } from 'lib/hooks/useClickOutSide'
 import { TodoItem } from './TodoItem'
 import PropTypes from 'prop-types'
 import { useDrag, useDrop } from 'react-dnd'
@@ -32,7 +33,6 @@ const CardContainer = styled.div`
   max-height: 100%;
   border-radius: 4px;
   background-color: rgba(235, 236, 240);
-  position: relative;
   ${({ isDragging }) => isDragging && tw`opacity-0`}
 `
 
@@ -40,9 +40,20 @@ StatusCard.propTypes = {
   list: PropTypes.object.isRequired,
   todos: PropTypes.object.isRequired,
   taskDispatch: PropTypes.func.isRequired,
+  index: PropTypes.number,
 }
 
-export function StatusCard({ list, todos, taskDispatch }) {
+export function StatusCard({ list, todos, index, taskDispatch }) {
+  const { id, title: cardTitle, todoIds } = list
+  const [isAdding, setIsAdding] = useState(false)
+  const addTodoBtnRef = useRef()
+  const textareaRef = useRef()
+  const listRef = useRef()
+  const todosWrapperRef = useRef()
+  const addTodoFormRef = useRef()
+
+  useClickOutSide(addTodoFormRef, () => setIsAdding(false))
+
   const [, drop] = useDrop(
     () => ({
       accept: 'todo',
@@ -56,60 +67,54 @@ export function StatusCard({ list, todos, taskDispatch }) {
         })
         item.status = list.id
       },
-      collect: (monitor) => {
-        return {
-          isOver: !!monitor.isOver(),
-        }
-      },
     }),
-    [list]
+    [list.todoIds]
   )
 
-  const [, listDrop] = useDrop(
-    () => ({
-      accept: 'list',
-      collect(monitor) {
-        return {
-          handlerId: monitor.getHandlerId(),
-        }
-      },
+  const [{ handlerId }, listDrop] = useDrop(() => ({
+    accept: 'list',
+    collect(monitor) {
+      return {
+        handlerId: monitor.getHandlerId(),
+      }
+    },
+    hover(item) {
+      if (!listRef.current) return
 
-      hover(item) {
-        if (!cardListRef.current) return
+      const dragId = item.list.id
+      const hoverId = list.id
+      if (dragId === hoverId) return
 
-        const dragId = item.list.id
-        const hoverId = list.id
-        if (dragId === hoverId) return
-
-        taskDispatch({
-          type: 'DRAG_LIST',
-          payload: { dragList: item.list, hoverList: list },
-        })
-      },
-    }),
-    [list]
-  )
+      taskDispatch({
+        type: 'DRAG_LIST',
+        payload: { dragList: item.list, hoverList: list },
+      })
+    },
+  }))
 
   const [{ isDragging }, drag, preview] = useDrag(
     () => ({
       type: 'list',
       item: () => {
-        return { list: { ...list }, todos: { ...todos } }
+        return { list: { ...list, index }, todos: { ...todos } }
       },
       collect: (monitor) => ({
-        isDragging: !!monitor.isDragging(),
+        isDragging: monitor.isDragging(),
       }),
     }),
-    [list]
+    [list, todos, index]
   )
-  const { id, title: cardTitle, todoIds } = list
-  const [isAdding, setIsAdding] = useState(false)
-  const textareaRef = useRef()
-  const cardListRef = useRef()
 
   useEffect(() => {
     preview(getEmptyImage(), { captureDraggingState: true })
   }, [preview])
+
+  useLayoutEffect(() => {
+    if (!isAdding) return
+
+    const { current: box } = todosWrapperRef
+    box.scrollTop = box.scrollHeight
+  }, [todos, isAdding])
 
   function changeCardTitle() {
     const { editor } = textareaRef.current
@@ -149,11 +154,16 @@ export function StatusCard({ list, todos, taskDispatch }) {
     e.target.reset()
   }
 
-  drag(cardListRef)
-  listDrop(cardListRef)
+  drop(todosWrapperRef)
+  drag(listRef)
+  listDrop(listRef)
 
   return (
-    <StatusCardWraper ref={cardListRef} isDragging={isDragging}>
+    <StatusCardWraper
+      ref={listRef}
+      isDragging={isDragging}
+      data-handler-id={handlerId}
+    >
       <CardContainer isDragging={isDragging}>
         <div css={tw`flex items-center px-[8px] space-x-[6px]`}>
           <div css={tw`min-h-[20px] py-[10px] cursor-pointer w-full`}>
@@ -203,19 +213,24 @@ export function StatusCard({ list, todos, taskDispatch }) {
           </Menu>
         </div>
         <div
-          ref={drop}
-          css={tw`px-[8px] pb-[8px] space-y-[8px] overflow-y-auto max-h-[770px]`}
+          ref={todosWrapperRef}
+          css={[
+            tw`px-[8px] pb-[8px] space-y-[8px] overflow-y-auto`,
+            css`
+              max-height: calc(100vh - 204px);
+            `,
+          ]}
         >
           {todoIds.map((todoId, idx) => (
             <TodoItem
               key={todoId}
               todo={todos[todoId]}
-              idx={idx}
+              index={idx}
               taskDispatch={taskDispatch}
             />
           ))}
           {isAdding ? (
-            <form onSubmit={addNewTodo}>
+            <form ref={addTodoFormRef} onSubmit={addNewTodo}>
               <div
                 css={tw`px-[8px] py-[6px] mb-[8px] bg-white rounded shadow-md`}
               >
@@ -229,7 +244,10 @@ export function StatusCard({ list, todos, taskDispatch }) {
                     e.target.style.height = `${e.target.scrollHeight}px`
                   }}
                   onKeyDown={(e) => {
-                    if (e.keyCode === 13) return e.preventDefault()
+                    if (e.keyCode === 13) {
+                      e.preventDefault()
+                      addTodoBtnRef.current.click()
+                    }
                   }}
                   autoFocus
                 />
@@ -237,7 +255,7 @@ export function StatusCard({ list, todos, taskDispatch }) {
               <div css={tw`flex items-center space-x-4`}>
                 <button
                   css={tw`bg-sky-600 text-white text-sm px-[12px] py-[6px] rounded`}
-                  type="submit"
+                  ref={addTodoBtnRef}
                 >
                   新增卡片
                 </button>
@@ -252,7 +270,7 @@ export function StatusCard({ list, todos, taskDispatch }) {
         </div>
         {isAdding ? null : (
           <div css={tw`px-[8px] pb-[8px]`}>
-            <AddButton text={'新增卡片'} onClick={() => setIsAdding(true)} />
+            <AddButton text="新增卡片" onClick={() => setIsAdding(true)} />
           </div>
         )}
       </CardContainer>

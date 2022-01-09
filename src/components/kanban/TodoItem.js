@@ -10,49 +10,58 @@ import { TodoInfoPanel } from './TodoInfoPanel'
 TodoItem.propTypes = {
   todo: PropTypes.object.isRequired,
   taskDispatch: PropTypes.func.isRequired,
+  index: PropTypes.number,
 }
 
-export function TodoItem({ todo, taskDispatch }) {
+export function TodoItem({ todo, index, taskDispatch }) {
+  const { title, isDragging } = todo
   const todoRef = useRef()
-  const [{ handlerId }, drop] = useDrop(
-    {
-      accept: 'todo',
-      collect(monitor) {
-        return {
-          handlerId: monitor.getHandlerId(),
-        }
-      },
-
-      hover(item) {
-        if (!todoRef.current) return
-
-        const dragId = item.id
-        const hoverId = todo.id
-        if (dragId === hoverId) return
-
-        if (item.status === todo.status) {
-          taskDispatch({
-            type: 'DRAG_TODO_TO_SAME_LIST',
-            payload: { dragTodo: item, hoverTodo: todo },
-          })
-        } else {
-          taskDispatch({
-            type: 'DRAG_TODO_TO_OTHER_LIST',
-            payload: { dragTodo: item, hoverTodo: todo },
-          })
-
-          item.status = todo.status
-        }
-      },
+  const [{ handlerId }, drop] = useDrop({
+    accept: 'todo',
+    collect(monitor) {
+      return {
+        handlerId: monitor.getHandlerId(),
+      }
     },
-    [todo]
-  )
 
-  const [{ isDragging }, drag, preview] = useDrag(
+    hover(item, monitor) {
+      if (!todoRef.current) return
+
+      const dragId = item.id
+      const hoverId = todo.id
+      const dragIndex = item.index
+      const hoverIndex = index
+      const dragType =
+        item.status === todo.status
+          ? 'DRAG_TODO_TO_SAME_LIST'
+          : 'DRAG_TODO_TO_OTHER_LIST'
+
+      if (dragId === hoverId) return
+
+      const hoverBoundingRect = todoRef.current?.getBoundingClientRect()
+      const hoverMiddleY =
+        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
+      const clientOffset = monitor.getClientOffset()
+      const hoverClientY = clientOffset.y - hoverBoundingRect.top
+
+      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return
+      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return
+
+      taskDispatch({
+        type: dragType,
+        payload: { dragTodo: item, hoverTodo: todo },
+      })
+
+      item.index = hoverIndex
+      item.status = todo.status
+    },
+  })
+
+  const [{ isDragging: isDragStart }, drag, preview] = useDrag(
     () => ({
       type: 'todo',
       item: () => {
-        return { ...todo }
+        return { ...todo, index }
       },
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
@@ -64,25 +73,25 @@ export function TodoItem({ todo, taskDispatch }) {
         })
       },
     }),
-    [todo]
+    [index, todo]
   )
-  const { title, isDragging: isTodoDragging } = todo
 
   useEffect(() => {
     preview(getEmptyImage(), { captureDraggingState: true })
   }, [preview])
 
   useEffect(() => {
-    if (!isDragging) return
+    if (!isDragStart) return
 
     taskDispatch({
       type: 'TOGGLE_TODO_DRAGGING',
       payload: { todoId: todo.id, isDragging: true },
     })
-  }, [isDragging])
+  }, [isDragStart])
 
   drag(todoRef)
   drop(todoRef)
+
   return (
     <Modal>
       <ModalOpenBtn>
@@ -90,7 +99,7 @@ export function TodoItem({ todo, taskDispatch }) {
           ref={todoRef}
           css={[
             tw`px-[8px] py-[6px] text-sm cursor-pointer rounded shadow-md overflow-hidden break-words bg-white hover:bg-white/50`,
-            isTodoDragging ? tw`!bg-gray-300 !text-gray-300` : '',
+            isDragging ? tw`!bg-gray-300 !text-gray-300` : '',
           ]}
           data-handler-id={handlerId}
         >

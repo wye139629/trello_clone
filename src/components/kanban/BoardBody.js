@@ -1,35 +1,33 @@
 import tw, { css, styled } from 'twin.macro'
 
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { StatusCard } from './StatusCard'
 import { Icon } from 'components/shared'
 import { faPlus, faTimes } from 'lib/fontawsome/icons'
 import { useTaskReducer } from 'context/taskContext'
-import { useDrop } from 'react-dnd'
+import { useClickOutSide } from 'lib/hooks/useClickOutSide'
 
 const ContentContainer = styled.div(() => [
   css`
-    height: calc(100% - 52px);
-    display: flex;
-    padding: 0 10px;
-    overflow: auto;
-    align-items: start;
+    height: calc(100vh - 104px);
   `,
-  tw`space-x-[8px]`,
+  tw`flex p-[10px] items-start space-x-[8px] overflow-x-auto overflow-y-hidden`,
 ])
 
 export function BoardBody() {
-  const [, drop] = useDrop(() => ({
-    accept: 'list',
-    collect: (monitor) => {
-      return {
-        isOver: !!monitor.isOver(),
-      }
-    },
-  }))
   const [isOpen, setIsOpen] = useState(false)
   const [taskState, taskDispatch] = useTaskReducer()
   const { lists, listOrder, todos } = taskState
+  const boardContentRef = useRef()
+  const addListFormRef = useRef()
+  useClickOutSide(addListFormRef, () => setIsOpen(false))
+
+  useLayoutEffect(() => {
+    if (!isOpen) return
+
+    const { current: boardContentEl } = boardContentRef
+    boardContentEl.scrollLeft = boardContentEl.scrollWidth
+  }, [isOpen, lists])
 
   function addNewList(e) {
     e.preventDefault()
@@ -45,12 +43,13 @@ export function BoardBody() {
   }
 
   return (
-    <ContentContainer ref={drop}>
-      {listOrder.map((listId) => (
+    <ContentContainer>
+      {listOrder.map((listId, idx) => (
         <StatusCard
           key={listId}
           list={lists[listId]}
           todos={todos}
+          index={idx}
           taskDispatch={taskDispatch}
         />
       ))}
@@ -58,15 +57,11 @@ export function BoardBody() {
         <form
           css={[
             css`
-              background-color: rgba(235, 236, 240);
-              align-self: start;
-              width: 270px;
-              padding: 4px;
-              border-radius: 4px;
               flex-shrink: 0;
             `,
-            tw`space-y-[4px]`,
+            tw`space-y-[4px] bg-listGray w-[270px] p-[4px] rounded-[4px] self-start`,
           ]}
+          ref={addListFormRef}
           onSubmit={addNewList}
         >
           <input
