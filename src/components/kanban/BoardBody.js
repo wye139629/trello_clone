@@ -5,7 +5,6 @@ import { StatusCard } from './StatusCard'
 import { Icon } from 'components/shared'
 import { faPlus, faTimes } from 'lib/fontawsome/icons'
 import { useTaskReducer } from 'context/taskContext'
-import { useDrop } from 'react-dnd'
 import { useClickOutSide } from 'lib/hooks/useClickOutSide'
 
 const ContentContainer = styled.div(() => [
@@ -16,14 +15,6 @@ const ContentContainer = styled.div(() => [
 ])
 
 export function BoardBody() {
-  const [, drop] = useDrop(() => ({
-    accept: 'list',
-    collect: (monitor) => {
-      return {
-        isOver: !!monitor.isOver(),
-      }
-    },
-  }))
   const [isOpen, setIsOpen] = useState(false)
   const [taskState, taskDispatch] = useTaskReducer()
   const { lists, listOrder, todos } = taskState
@@ -32,6 +23,8 @@ export function BoardBody() {
   useClickOutSide(addListFormRef, () => setIsOpen(false))
 
   useLayoutEffect(() => {
+    if (!isOpen) return
+
     const { current: boardContentEl } = boardContentRef
     boardContentEl.scrollLeft = boardContentEl.scrollWidth
   }, [isOpen, lists])
@@ -49,15 +42,14 @@ export function BoardBody() {
     e.target.reset()
   }
 
-  drop(boardContentRef)
-
   return (
-    <ContentContainer ref={boardContentRef}>
-      {listOrder.map((listId) => (
+    <ContentContainer>
+      {listOrder.map((listId, idx) => (
         <StatusCard
           key={listId}
           list={lists[listId]}
           todos={todos}
+          index={idx}
           taskDispatch={taskDispatch}
         />
       ))}

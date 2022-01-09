@@ -40,9 +40,20 @@ StatusCard.propTypes = {
   list: PropTypes.object.isRequired,
   todos: PropTypes.object.isRequired,
   taskDispatch: PropTypes.func.isRequired,
+  index: PropTypes.number,
 }
 
-export function StatusCard({ list, todos, taskDispatch }) {
+export function StatusCard({ list, todos, index, taskDispatch }) {
+  const { id, title: cardTitle, todoIds } = list
+  const [isAdding, setIsAdding] = useState(false)
+  const addTodoBtnRef = useRef()
+  const textareaRef = useRef()
+  const listRef = useRef()
+  const todosWrapperRef = useRef()
+  const addTodoFormRef = useRef()
+
+  useClickOutSide(addTodoFormRef, () => setIsAdding(false))
+
   const [, drop] = useDrop(
     () => ({
       accept: 'todo',
@@ -56,60 +67,43 @@ export function StatusCard({ list, todos, taskDispatch }) {
         })
         item.status = list.id
       },
-      collect: (monitor) => {
-        return {
-          isOver: !!monitor.isOver(),
-        }
-      },
     }),
-    [list]
+    [list.todoIds]
   )
 
-  const [, listDrop] = useDrop(
-    () => ({
-      accept: 'list',
-      collect(monitor) {
-        return {
-          handlerId: monitor.getHandlerId(),
-        }
-      },
+  const [{ handlerId }, listDrop] = useDrop(() => ({
+    accept: 'list',
+    collect(monitor) {
+      return {
+        handlerId: monitor.getHandlerId(),
+      }
+    },
+    hover(item) {
+      if (!listRef.current) return
 
-      hover(item) {
-        if (!cardListRef.current) return
+      const dragId = item.list.id
+      const hoverId = list.id
+      if (dragId === hoverId) return
 
-        const dragId = item.list.id
-        const hoverId = list.id
-        if (dragId === hoverId) return
-
-        taskDispatch({
-          type: 'DRAG_LIST',
-          payload: { dragList: item.list, hoverList: list },
-        })
-      },
-    }),
-    [list]
-  )
+      taskDispatch({
+        type: 'DRAG_LIST',
+        payload: { dragList: item.list, hoverList: list },
+      })
+    },
+  }))
 
   const [{ isDragging }, drag, preview] = useDrag(
     () => ({
       type: 'list',
       item: () => {
-        return { list: { ...list }, todos: { ...todos } }
+        return { list: { ...list, index }, todos: { ...todos } }
       },
       collect: (monitor) => ({
-        isDragging: !!monitor.isDragging(),
+        isDragging: monitor.isDragging(),
       }),
     }),
-    [list]
+    [list, todos, index]
   )
-  const { id, title: cardTitle, todoIds } = list
-  const [isAdding, setIsAdding] = useState(false)
-  const addTodoBtnRef = useRef()
-  const textareaRef = useRef()
-  const cardListRef = useRef()
-  const todosWrapperRef = useRef()
-  const addTodoFormRef = useRef()
-  useClickOutSide(addTodoFormRef, () => setIsAdding(false))
 
   useEffect(() => {
     preview(getEmptyImage(), { captureDraggingState: true })
@@ -161,11 +155,15 @@ export function StatusCard({ list, todos, taskDispatch }) {
   }
 
   drop(todosWrapperRef)
-  drag(cardListRef)
-  listDrop(cardListRef)
+  drag(listRef)
+  listDrop(listRef)
 
   return (
-    <StatusCardWraper ref={cardListRef} isDragging={isDragging}>
+    <StatusCardWraper
+      ref={listRef}
+      isDragging={isDragging}
+      data-handler-id={handlerId}
+    >
       <CardContainer isDragging={isDragging}>
         <div css={tw`flex items-center px-[8px] space-x-[6px]`}>
           <div css={tw`min-h-[20px] py-[10px] cursor-pointer w-full`}>
@@ -227,7 +225,7 @@ export function StatusCard({ list, todos, taskDispatch }) {
             <TodoItem
               key={todoId}
               todo={todos[todoId]}
-              idx={idx}
+              index={idx}
               taskDispatch={taskDispatch}
             />
           ))}
