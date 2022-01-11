@@ -36,7 +36,8 @@
     "react-dnd": "^14.0.4",
     "react-dnd-html5-backend": "^14.0.2",
     "react-dom": "^17.0.2",
-    "react-query": "^3.34.7"
+    "react-query": "^3.34.7",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.16.0",

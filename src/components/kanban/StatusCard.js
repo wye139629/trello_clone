@@ -17,6 +17,8 @@ import {
   MenuButton,
   MenuItem as ReachMenuItem,
 } from '@reach/menu-button'
+import { useMutation, useQueryClient } from 'react-query'
+import { client } from 'lib/api/client'
 
 const MenuList = tw(ReachMenuList)`w-[300px]`
 const MenuItem = tw(ReachMenuItem)`hover:bg-red-500`
@@ -38,21 +40,71 @@ const CardContainer = styled.div`
 
 StatusCard.propTypes = {
   list: PropTypes.object.isRequired,
-  todos: PropTypes.object.isRequired,
-  taskDispatch: PropTypes.func.isRequired,
   index: PropTypes.number,
 }
 
-export function StatusCard({ list, todos, index, taskDispatch }) {
-  const { id, title: cardTitle, todoIds } = list
+export function StatusCard({ list, index }) {
+  const { id, title: cardTitle, todos } = list
   const [isAdding, setIsAdding] = useState(false)
   const addTodoBtnRef = useRef()
   const textareaRef = useRef()
   const listRef = useRef()
   const todosWrapperRef = useRef()
   const addTodoFormRef = useRef()
+  const queryClient = useQueryClient()
 
   useClickOutSide(addTodoFormRef, () => setIsAdding(false))
+
+  const { mutate } = useMutation(
+    (updates) =>
+      client(`lists/${updates.id}`, { data: updates, method: 'PATCH' }),
+    {
+      onMutate: (newList) => {
+        const previous = queryClient.getQueryData('lists')
+
+        queryClient.setQueryData('lists', (old) =>
+          old.map((oldList) =>
+            oldList.id === newList.id ? { ...oldList, ...newList } : oldList
+          )
+        )
+        return () => {
+          queryClient.setQueryData('lists', previous)
+        }
+      },
+      onSuccess: (result, newList) => {
+        queryClient.setQueryData('lists', (old) =>
+          old.map((list) =>
+            list.id === newList.id ? { ...list, ...result.data } : list
+          )
+        )
+      },
+      onError: (error, data, onMutateRecover) => {
+        alert('Sorry something went wrong, please try again later')
+        onMutateRecover()
+      },
+    }
+  )
+
+  const { mutate: deleteMutate } = useMutation(
+    (destroy) => client(`lists/${destroy.id}`, { method: 'DELETE' }),
+    {
+      onMutate: (destroy) => {
+        const previous = queryClient.getQueryData('lists')
+
+        queryClient.setQueryData('lists', (old) =>
+          old.filter((oldList) => oldList.id !== destroy.id)
+        )
+
+        return () => {
+          queryClient.setQueryData('lists', previous)
+        }
+      },
+      onError: (error, destroy, onMutateRecover) => {
+        alert('Sorry something went wrong, please try again later')
+        onMutateRecover()
+      },
+    }
+  )
 
   const [, drop] = useDrop(
     () => ({
@@ -61,14 +113,14 @@ export function StatusCard({ list, todos, index, taskDispatch }) {
         if (item.status === list.id) return
         if (list.todoIds.length > 0) return
 
-        taskDispatch({
-          type: 'DROP_TODO_TO_EMPETY',
-          payload: { todo: item, targetListId: list.id },
-        })
+        // taskDispatch({
+        //   type: 'DROP_TODO_TO_EMPETY',
+        //   payload: { todo: item, targetListId: list.id },
+        // })
         item.status = list.id
       },
     }),
-    [list.todoIds]
+    [todos]
   )
 
   const [{ handlerId }, listDrop] = useDrop(() => ({
@@ -85,10 +137,10 @@ export function StatusCard({ list, todos, index, taskDispatch }) {
       const hoverId = list.id
       if (dragId === hoverId) return
 
-      taskDispatch({
-        type: 'DRAG_LIST',
-        payload: { dragList: item.list, hoverList: list },
-      })
+      // taskDispatch({
+      //   type: 'DRAG_LIST',
+      //   payload: { dragList: item.list, hoverList: list },
+      // })
     },
   }))
 
@@ -127,28 +179,33 @@ export function StatusCard({ list, todos, index, taskDispatch }) {
     updateStatusList(editor.value)
 
     function updateStatusList(value) {
-      taskDispatch({ type: 'EDIT_LIST_TITLE', payload: { id, title: value } })
+      mutate({ id, title: value })
     }
+  }
+
+  function deleteList() {
+    alert(`Are you sure you want to remove ${cardTitle} list and the tasks ?`)
+    deleteMutate({ id })
   }
 
   function addNewTodo(e) {
     e.preventDefault()
     const textareaEl = e.target.elements['todoTitle']
-    const { value, style } = textareaEl
+    const { style } = textareaEl
 
-    taskDispatch({
-      type: 'ADD_TODO',
-      payload: {
-        listId: id,
-        todo: {
-          id: `todo-${Date.now()}`,
-          title: value,
-          status: id,
-          description: '',
-          isDraging: false,
-        },
-      },
-    })
+    // taskDispatch({
+    //   type: 'ADD_TODO',
+    //   payload: {
+    //     listId: id,
+    //     todo: {
+    //       id: `todo-${Date.now()}`,
+    //       title: value,
+    //       status: id,
+    //       description: '',
+    //       isDraging: false,
+    //     },
+    //   },
+    // })
 
     style.height = '54px'
     e.target.reset()
@@ -201,14 +258,7 @@ export function StatusCard({ list, todos, index, taskDispatch }) {
               <div css={tw`px-[10px] mb-[10px] relative`}>
                 <h4 css={tw`text-center border-b pb-[8px]`}>列表動作</h4>
               </div>
-              <MenuItem
-                onSelect={() => {
-                  alert(`Are you sure you want to remove ${id} and the tasks ?`)
-                  taskDispatch({ type: 'REMOVE_LIST', payload: { listId: id } })
-                }}
-              >
-                刪除
-              </MenuItem>
+              <MenuItem onSelect={deleteList}>刪除</MenuItem>
             </MenuList>
           </Menu>
         </div>
@@ -221,12 +271,12 @@ export function StatusCard({ list, todos, index, taskDispatch }) {
             `,
           ]}
         >
-          {todoIds.map((todoId, idx) => (
+          {todos.map((todo, idx) => (
             <TodoItem
-              key={todoId}
-              todo={todos[todoId]}
+              key={todo.id}
               index={idx}
-              taskDispatch={taskDispatch}
+              todo={todo}
+              // taskDispatch={taskDispatch}
             />
           ))}
           {isAdding ? (
