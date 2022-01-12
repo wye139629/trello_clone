@@ -9,11 +9,10 @@ import { TodoInfoPanel } from './TodoInfoPanel'
 
 TodoItem.propTypes = {
   todo: PropTypes.object.isRequired,
-  taskDispatch: PropTypes.func.isRequired,
   index: PropTypes.number,
 }
 
-export function TodoItem({ todo, index, taskDispatch }) {
+export function TodoItem({ todo, index }) {
   const { title, isDragging } = todo
   const todoRef = useRef()
   const [{ handlerId }, drop] = useDrop({
@@ -31,10 +30,10 @@ export function TodoItem({ todo, index, taskDispatch }) {
       const hoverId = todo.id
       const dragIndex = item.index
       const hoverIndex = index
-      const dragType =
-        item.status === todo.status
-          ? 'DRAG_TODO_TO_SAME_LIST'
-          : 'DRAG_TODO_TO_OTHER_LIST'
+      // const dragType =
+      //   item.status === todo.status
+      //     ? 'DRAG_TODO_TO_SAME_LIST'
+      //     : 'DRAG_TODO_TO_OTHER_LIST'
 
       if (dragId === hoverId) return
 
@@ -47,10 +46,10 @@ export function TodoItem({ todo, index, taskDispatch }) {
       if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return
       if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return
 
-      taskDispatch({
-        type: dragType,
-        payload: { dragTodo: item, hoverTodo: todo },
-      })
+      // taskDispatch({
+      //   type: dragType,
+      //   payload: { dragTodo: item, hoverTodo: todo },
+      // })
 
       item.index = hoverIndex
       item.status = todo.status
@@ -66,11 +65,11 @@ export function TodoItem({ todo, index, taskDispatch }) {
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
       }),
-      end(item) {
-        taskDispatch({
-          type: 'TOGGLE_TODO_DRAGGING',
-          payload: { todoId: item.id, isDragging: false },
-        })
+      end() {
+        // taskDispatch({
+        //   type: 'TOGGLE_TODO_DRAGGING',
+        //   payload: { todoId: item.id, isDragging: false },
+        // })
       },
     }),
     [index, todo]
@@ -83,10 +82,10 @@ export function TodoItem({ todo, index, taskDispatch }) {
   useEffect(() => {
     if (!isDragStart) return
 
-    taskDispatch({
-      type: 'TOGGLE_TODO_DRAGGING',
-      payload: { todoId: todo.id, isDragging: true },
-    })
+    // taskDispatch({
+    //   type: 'TOGGLE_TODO_DRAGGING',
+    //   payload: { todoId: todo.id, isDragging: true },
+    // })
   }, [isDragStart])
 
   drag(todoRef)
@@ -107,7 +106,7 @@ export function TodoItem({ todo, index, taskDispatch }) {
         </div>
       </ModalOpenBtn>
       <ModalContent aria-label="Todo Information form">
-        <TodoInfoPanel todo={todo} taskDispatch={taskDispatch} />
+        <TodoInfoPanel todo={todo} />
       </ModalContent>
     </Modal>
   )

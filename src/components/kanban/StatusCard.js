@@ -1,6 +1,6 @@
 import tw, { css, styled } from 'twin.macro'
-
 import '@reach/menu-button/styles.css'
+
 import { useState, useLayoutEffect, useEffect, useRef } from 'react'
 import { Switcher, Displayer, Editor } from '../shared'
 import { AddButton } from './AddButton'
@@ -19,6 +19,7 @@ import {
 } from '@reach/menu-button'
 import { useMutation, useQueryClient } from 'react-query'
 import { client } from 'lib/api/client'
+import { v4 as uuidv4 } from 'uuid'
 
 const MenuList = tw(ReachMenuList)`w-[300px]`
 const MenuItem = tw(ReachMenuItem)`hover:bg-red-500`
@@ -98,6 +99,56 @@ export function StatusCard({ list, index }) {
         return () => {
           queryClient.setQueryData('lists', previous)
         }
+      },
+      onError: (error, destroy, onMutateRecover) => {
+        alert('Sorry something went wrong, please try again later')
+        onMutateRecover()
+      },
+    }
+  )
+
+  const { mutate: addTodoMutate } = useMutation(
+    (newTodo) => client('tasks', { data: newTodo }),
+    {
+      onMutate: (newTodo) => {
+        const previous = queryClient.getQueryData('lists')
+
+        const optimisticTodo = { ...newTodo, id: uuidv4() }
+        const targetList = previous.find((list) => list.id === newTodo.list_id)
+        const optimisticList = {
+          ...targetList,
+          todos: [...targetList.todos, optimisticTodo],
+        }
+
+        queryClient.setQueryData('lists', (old) => {
+          return old.map((list) =>
+            list.id === newTodo.list_id ? optimisticList : list
+          )
+        })
+
+        return {
+          onMutateRecover: () => {
+            queryClient.setQueryData('lists', previous)
+          },
+          optimisticList,
+          optimisticTodo,
+        }
+      },
+      onSuccess: (result, newTodo, context) => {
+        const { optimisticList, optimisticTodo } = context
+
+        queryClient.setQueryData('lists', (old) =>
+          old.map((list) =>
+            list.id === optimisticList.id
+              ? {
+                  ...list,
+                  todos: list.todos.map((todo) =>
+                    todo.id === optimisticTodo.id ? result.data : todo
+                  ),
+                }
+              : list
+          )
+        )
       },
       onError: (error, destroy, onMutateRecover) => {
         alert('Sorry something went wrong, please try again later')
@@ -191,21 +242,9 @@ export function StatusCard({ list, index }) {
   function addNewTodo(e) {
     e.preventDefault()
     const textareaEl = e.target.elements['todoTitle']
-    const { style } = textareaEl
+    const { value, style } = textareaEl
 
-    // taskDispatch({
-    //   type: 'ADD_TODO',
-    //   payload: {
-    //     listId: id,
-    //     todo: {
-    //       id: `todo-${Date.now()}`,
-    //       title: value,
-    //       status: id,
-    //       description: '',
-    //       isDraging: false,
-    //     },
-    //   },
-    // })
+    addTodoMutate({ title: value, description: '', list_id: id })
 
     style.height = '54px'
     e.target.reset()
