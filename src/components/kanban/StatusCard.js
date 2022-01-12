@@ -162,7 +162,7 @@ export function StatusCard({ list, index }) {
       accept: 'todo',
       hover(item) {
         if (item.status === list.id) return
-        if (list.todoIds.length > 0) return
+        if (list.todos.length > 0) return
 
         // taskDispatch({
         //   type: 'DROP_TODO_TO_EMPETY',
@@ -174,26 +174,31 @@ export function StatusCard({ list, index }) {
     [todos]
   )
 
-  const [{ handlerId }, listDrop] = useDrop(() => ({
-    accept: 'list',
-    collect(monitor) {
-      return {
-        handlerId: monitor.getHandlerId(),
-      }
-    },
-    hover(item) {
-      if (!listRef.current) return
+  const [{ handlerId }, listDrop] = useDrop(
+    () => ({
+      accept: 'list',
+      collect(monitor) {
+        return {
+          handlerId: monitor.getHandlerId(),
+        }
+      },
+      hover(item) {
+        if (!listRef.current) return
+        const { list: draggingList } = item
 
-      const dragId = item.list.id
-      const hoverId = list.id
-      if (dragId === hoverId) return
+        const dragId = draggingList.id
+        const hoverId = list.id
+        if (dragId === hoverId) return
 
-      // taskDispatch({
-      //   type: 'DRAG_LIST',
-      //   payload: { dragList: item.list, hoverList: list },
-      // })
-    },
-  }))
+        const oldLists = queryClient.getQueryData('lists')
+        const newList = oldLists.filter((list) => list.id !== dragId)
+        newList.splice(index, 0, item.list)
+
+        queryClient.setQueryData('lists', newList)
+      },
+    }),
+    [list, index]
+  )
 
   const [{ isDragging }, drag, preview] = useDrag(
     () => ({
@@ -204,6 +209,28 @@ export function StatusCard({ list, index }) {
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
+      end: (item) => {
+        const lists = queryClient.getQueryData('lists')
+        const targetIndex = lists.findIndex((list) => list.id === item.list.id)
+        if (item.list.index === targetIndex) return
+
+        let targetPos
+        const previous = lists[targetIndex - 1]
+        const next = lists[targetIndex + 1]
+        if (previous && next) {
+          targetPos = (next.pos - previous.pos) * 0.5 + previous.pos
+        }
+
+        if (!previous) {
+          targetPos = next.pos * 0.5
+        }
+
+        if (!next) {
+          targetPos = previous.pos + 50000
+        }
+
+        mutate({ id: item.list.id, position: targetPos })
+      },
     }),
     [list, todos, index]
   )
