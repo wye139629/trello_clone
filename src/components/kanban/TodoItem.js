@@ -6,6 +6,8 @@ import { getEmptyImage } from 'react-dnd-html5-backend'
 import { useEffect, useRef } from 'react'
 import { Modal, ModalContent, ModalOpenBtn } from '../shared'
 import { TodoInfoPanel } from './TodoInfoPanel'
+import { useMutation, useQueryClient } from 'react-query'
+import { client } from 'lib/api/client'
 
 TodoItem.propTypes = {
   todo: PropTypes.object.isRequired,
@@ -13,8 +15,39 @@ TodoItem.propTypes = {
 }
 
 export function TodoItem({ todo, index }) {
-  const { title, isDragging } = todo
+  const { title, id } = todo
   const todoRef = useRef()
+  const queryClient = useQueryClient()
+
+  const { mutate: updateTodoMutate } = useMutation(
+    (updates) =>
+      client(`tasks/${updates.id}`, { method: 'PATCH', data: updates }),
+    {
+      onMutate: (updates) => {
+        const previous = queryClient.getQueryData('lists')
+        const targetList = previous.find((list) => list.id === updates.list_id)
+        const nextTodos = targetList.todos.map((todo) =>
+          todo.id === id ? { ...todo, ...updates } : todo
+        )
+
+        queryClient.setQueryData('lists', (old) =>
+          old.map((list) =>
+            list.id === updates.list_id
+              ? { ...targetList, todos: nextTodos }
+              : list
+          )
+        )
+
+        return () => {
+          queryClient.setQueryData('lists', previous)
+        }
+      },
+      onError: (err, updates, onMutateRecover) => {
+        onMutateRecover()
+      },
+    }
+  )
+
   const [{ handlerId }, drop] = useDrop({
     accept: 'todo',
     collect(monitor) {
@@ -30,10 +63,7 @@ export function TodoItem({ todo, index }) {
       const hoverId = todo.id
       const dragIndex = item.index
       const hoverIndex = index
-      // const dragType =
-      //   item.status === todo.status
-      //     ? 'DRAG_TODO_TO_SAME_LIST'
-      //     : 'DRAG_TODO_TO_OTHER_LIST'
+      const isToSameList = item.listId === todo.listId
 
       if (dragId === hoverId) return
 
@@ -46,17 +76,42 @@ export function TodoItem({ todo, index }) {
       if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return
       if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return
 
-      // taskDispatch({
-      //   type: dragType,
-      //   payload: { dragTodo: item, hoverTodo: todo },
-      // })
+      const previous = queryClient.getQueryData('lists')
+      const originList = previous.find((list) => list.id === item.listId)
+
+      if (isToSameList) {
+        const nextTodos = originList.todos.filter((todo) => todo.id !== dragId)
+        nextTodos.splice(hoverIndex, 0, item)
+        const nextList = { ...originList, todos: nextTodos }
+        queryClient.setQueryData('lists', (old) =>
+          old.map((list) => (list.id === item.listId ? nextList : list))
+        )
+      } else {
+        const nextTodos = originList.todos.filter((todo) => todo.id !== dragId)
+        const targetList = previous.find((list) => list.id === todo.listId)
+        const nextTargetTodos = [...targetList.todos]
+        nextTargetTodos.splice(hoverIndex, 0, {
+          ...item,
+          listId: targetList.id,
+        })
+        const nextOriginList = { ...originList, todos: nextTodos }
+        const nextTargetList = { ...targetList, todos: nextTargetTodos }
+
+        queryClient.setQueryData('lists', (old) =>
+          old.map((list) => {
+            if (list.id === item.listId) return nextOriginList
+            if (list.id === todo.listId) return nextTargetList
+            return list
+          })
+        )
+      }
 
       item.index = hoverIndex
-      item.status = todo.status
+      item.listId = todo.listId
     },
   })
 
-  const [{ isDragging: isDragStart }, drag, preview] = useDrag(
+  const [{ isDragging }, drag, preview] = useDrag(
     () => ({
       type: 'todo',
       item: () => {
@@ -65,28 +120,48 @@ export function TodoItem({ todo, index }) {
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
       }),
-      end() {
-        // taskDispatch({
-        //   type: 'TOGGLE_TODO_DRAGGING',
-        //   payload: { todoId: item.id, isDragging: false },
-        // })
+      isDragging: (monitor) => {
+        return todo.id === monitor.getItem().id
+      },
+      end(item) {
+        console.log('mutate')
+        const lists = queryClient.getQueryData('lists')
+        const targetList = lists.find((list) => list.id === item.listId)
+        const targetTodos = targetList.todos
+        const targetIndex = targetTodos.findIndex((todo) => todo.id === item.id)
+        let targetPos
+        const previous = targetTodos[targetIndex - 1]
+        const next = targetTodos[targetIndex + 1]
+
+        if (previous && next) {
+          targetPos = (next.pos - previous.pos) * 0.5 + previous.pos
+        }
+
+        if (!previous) {
+          targetPos = next ? next.pos * 0.5 : 0
+        }
+
+        if (!next) {
+          targetPos = previous ? previous.pos + 50000 : 0
+        }
+
+        if (!previous && !next) {
+          targetPos = item.pos
+        }
+
+        updateTodoMutate({
+          id: item.id,
+          list_id: item.listId,
+          position: targetPos,
+        })
       },
     }),
-    [index, todo]
+    [todo, index]
   )
 
   useEffect(() => {
     preview(getEmptyImage(), { captureDraggingState: true })
   }, [preview])
-
-  useEffect(() => {
-    if (!isDragStart) return
-
-    // taskDispatch({
-    //   type: 'TOGGLE_TODO_DRAGGING',
-    //   payload: { todoId: todo.id, isDragging: true },
-    // })
-  }, [isDragStart])
 
   drag(todoRef)
   drop(todoRef)

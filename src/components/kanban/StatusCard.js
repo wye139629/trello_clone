@@ -110,20 +110,18 @@ export function StatusCard({ list, index }) {
   const { mutate: addTodoMutate } = useMutation(
     (newTodo) => client('tasks', { data: newTodo }),
     {
-      onMutate: (newTodo) => {
+      onMutate: ({ title, list_id: listId, description }) => {
         const previous = queryClient.getQueryData('lists')
 
-        const optimisticTodo = { ...newTodo, id: uuidv4() }
-        const targetList = previous.find((list) => list.id === newTodo.list_id)
+        const optimisticTodo = { title, listId, description, id: uuidv4() }
+        const targetList = previous.find((list) => list.id === listId)
         const optimisticList = {
           ...targetList,
           todos: [...targetList.todos, optimisticTodo],
         }
 
         queryClient.setQueryData('lists', (old) => {
-          return old.map((list) =>
-            list.id === newTodo.list_id ? optimisticList : list
-          )
+          return old.map((list) => (list.id === listId ? optimisticList : list))
         })
 
         return {
@@ -164,11 +162,29 @@ export function StatusCard({ list, index }) {
         if (item.status === list.id) return
         if (list.todos.length > 0) return
 
-        // taskDispatch({
-        //   type: 'DROP_TODO_TO_EMPETY',
-        //   payload: { todo: item, targetListId: list.id },
-        // })
-        item.status = list.id
+        const previous = queryClient.getQueryData('lists')
+        const originList = previous.find(
+          (oldList) => oldList.id === item.listId
+        )
+
+        const nextTodos = originList.todos.filter((todo) => todo.id !== item.id)
+        const targetList = previous.find((oldList) => oldList.id === list.id)
+        const nextTargetTodos = [
+          ...targetList.todos,
+          { ...item, listId: targetList.id },
+        ]
+        const nextOriginList = { ...originList, todos: nextTodos }
+        const nextTargetList = { ...targetList, todos: nextTargetTodos }
+
+        queryClient.setQueryData('lists', (old) =>
+          old.map((oldList) => {
+            if (oldList.id === item.listId) return nextOriginList
+            if (oldList.id === list.id) return nextTargetList
+            return oldList
+          })
+        )
+
+        item.listId = targetList.id
       },
     }),
     [todos]
@@ -222,11 +238,11 @@ export function StatusCard({ list, index }) {
         }
 
         if (!previous) {
-          targetPos = next.pos * 0.5
+          targetPos = next ? next.pos * 0.5 : 0
         }
 
         if (!next) {
-          targetPos = previous.pos + 50000
+          targetPos = previous ? previous.pos + 50000 : 0
         }
 
         mutate({ id: item.list.id, position: targetPos })
