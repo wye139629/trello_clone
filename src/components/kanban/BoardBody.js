@@ -4,8 +4,10 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import { StatusCard } from './StatusCard'
 import { Icon } from 'components/shared'
 import { faPlus, faTimes } from 'lib/fontawsome/icons'
-import { useTaskReducer } from 'context/taskContext'
 import { useClickOutSide } from 'lib/hooks/useClickOutSide'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
+import { client } from 'lib/api/client'
+import { v4 as uuidv4 } from 'uuid'
 
 const ContentContainer = styled.div(() => [
   css`
@@ -16,42 +18,69 @@ const ContentContainer = styled.div(() => [
 
 export function BoardBody() {
   const [isOpen, setIsOpen] = useState(false)
-  const [taskState, taskDispatch] = useTaskReducer()
-  const { lists, listOrder, todos } = taskState
   const boardContentRef = useRef()
   const addListFormRef = useRef()
   useClickOutSide(addListFormRef, () => setIsOpen(false))
+  const { isLoading } = useQuery({
+    queryKey: 'lists',
+    queryFn: () =>
+      client('lists').then((res) => {
+        return res.data
+      }),
+  })
+  const queryClient = useQueryClient()
+  const listsCache = queryClient.getQueryData('lists')
+
+  const { mutate } = useMutation(
+    (newList) => client('lists', { data: newList }),
+    {
+      onMutate: (newList) => {
+        const optimisticList = { id: uuidv4(), title: newList.title, todos: [] }
+
+        queryClient.setQueryData('lists', (old) => [...old, optimisticList])
+
+        return { optimisticList }
+      },
+      onSuccess: (result, newList, context) => {
+        queryClient.setQueryData('lists', (old) =>
+          old.map((list) =>
+            list.id === context.optimisticList.id ? result.data : list
+          )
+        )
+      },
+      onError: (error, newList, context) => {
+        queryClient.setQueryData('lists', (old) =>
+          old.filter((list) => list.id !== context.optimisticList.id)
+        )
+      },
+    }
+  )
 
   useLayoutEffect(() => {
     if (!isOpen) return
 
     const { current: boardContentEl } = boardContentRef
     boardContentEl.scrollLeft = boardContentEl.scrollWidth
-  }, [isOpen, lists])
+  }, [isOpen, listsCache])
 
   function addNewList(e) {
     e.preventDefault()
     const value = e.target.elements['listTitle'].value
     if (value === '') return
 
-    taskDispatch({
-      type: 'ADD_LIST',
-      payload: { id: `list-${Date.now()}`, title: value, todoIds: [] },
-    })
+    mutate({ title: value })
 
     e.target.reset()
   }
 
+  if (isLoading) {
+    return <div>loading...</div>
+  }
+
   return (
-    <ContentContainer>
-      {listOrder.map((listId, idx) => (
-        <StatusCard
-          key={listId}
-          list={lists[listId]}
-          todos={todos}
-          index={idx}
-          taskDispatch={taskDispatch}
-        />
+    <ContentContainer ref={boardContentRef}>
+      {listsCache.map((list, idx) => (
+        <StatusCard key={list.id} list={list} index={idx} />
       ))}
       {isOpen ? (
         <form

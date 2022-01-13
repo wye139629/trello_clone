@@ -30,11 +30,14 @@
     "@fortawesome/react-fontawesome": "^0.1.16",
     "@reach/dialog": "^0.16.2",
     "@reach/menu-button": "^0.16.2",
+    "axios": "^0.24.0",
     "cross-env": "^7.0.3",
     "react": "^17.0.2",
     "react-dnd": "^14.0.4",
     "react-dnd-html5-backend": "^14.0.2",
-    "react-dom": "^17.0.2"
+    "react-dom": "^17.0.2",
+    "react-query": "^3.34.7",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.16.0",
@@ -53,6 +56,7 @@
     "babel-plugin-macros": "^3.1.0",
     "babel-plugin-twin": "^1.0.2",
     "css-loader": "^6.0.0",
+    "dotenv": "^10.0.0",
     "eslint": "^8.4.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-import-resolver-jest": "^3.0.2",

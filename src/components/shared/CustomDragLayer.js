@@ -1,7 +1,6 @@
 import tw, { css } from 'twin.macro'
 
 import { useDragLayer } from 'react-dnd'
-import { TodoItem } from '../kanban/TodoItem'
 import { StatusCard } from '../kanban/StatusCard'
 
 function getItemStyles(initialOffset, currentOffset) {
@@ -29,7 +28,13 @@ const CustomDragLayer = () => {
   function renderItem() {
     switch (itemType) {
       case 'todo':
-        return <TodoItem todo={item} taskDispatch={() => {}} />
+        return (
+          <div
+            css={tw`px-[8px] py-[6px] text-sm cursor-pointer rounded shadow-md overflow-hidden break-words bg-white hover:bg-white/50`}
+          >
+            {item.title}
+          </div>
+        )
       case 'list':
         return (
           <StatusCard

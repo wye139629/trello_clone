@@ -4,9 +4,9 @@ import PropTypes from 'prop-types'
 import { BoardHeader } from './BoardHeader'
 import { BoardBody } from './BoardBody'
 import { CustomDragLayer } from 'components/shared'
-import { TaskCtxProvider } from 'context/taskContext'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+import { QueryClient, QueryClientProvider } from 'react-query'
 
 const BoardContainer = styled.div(({ isOpen }) => [
   tw`pl-6 w-screen`,
@@ -20,16 +20,24 @@ Board.propTypes = {
   isOpen: PropTypes.bool.isRequired,
 }
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+})
+
 function Board({ isOpen }) {
   return (
     <BoardContainer isOpen={isOpen}>
       <BoardHeader></BoardHeader>
-      <TaskCtxProvider>
+      <QueryClientProvider client={queryClient}>
         <DndProvider backend={HTML5Backend}>
           <CustomDragLayer />
           <BoardBody />
         </DndProvider>
-      </TaskCtxProvider>
+      </QueryClientProvider>
     </BoardContainer>
   )
 }
