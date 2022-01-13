@@ -31,6 +31,7 @@
     "@reach/dialog": "^0.16.2",
     "@reach/menu-button": "^0.16.2",
     "axios": "^0.24.0",
+    "babel-plugin-transform-inline-environment-variables": "^0.4.3",
     "cross-env": "^7.0.3",
     "react": "^17.0.2",
     "react-dnd": "^14.0.4",
