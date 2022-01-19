@@ -1,22 +1,11 @@
-import kanbanBg from '/public/images/kanban-bg.jpg'
-import Navbar from 'components/nav/Navbar'
-import Kanban from './components/kanban/Kanban'
-import { css } from 'twin.macro'
+import { AuthenticatedApp } from './screens/AuthenticatedApp'
 
-const appStyle = css`
-  height: 100vh;
-  background-image: url(${kanbanBg});
-  background-size: cover;
-  background-repeat: no-repeat;
-`
+import { UnAuthenticatedApp } from './screens/UnAuthenticatedApp'
+import { useAuth } from 'context/authContext'
 
 function App() {
-  return (
-    <div css={appStyle}>
-      <Navbar />
-      <Kanban />
-    </div>
-  )
+  const { user } = useAuth()
+  return user ? <AuthenticatedApp /> : <UnAuthenticatedApp />
 }
 
 export default App
