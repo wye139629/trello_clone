@@ -6,6 +6,7 @@ import {
   createContext,
 } from 'react'
 import { client } from 'lib/api/client'
+import { FullPageSpinner } from 'components/shared'
 
 const AuthCtx = createContext()
 AuthCtx.displayName = 'AuthContext'
@@ -36,18 +37,20 @@ function AuthProvider(props) {
       })
   }, [])
 
-  const login = useCallback((form) => {
-    client('users/sign_in', {
-      data: {
-        user: form,
-      },
-    }).then((res) =>
-      setUserData((prev) => ({
-        ...prev,
-        data: res.data.user,
-      }))
-    )
-  }, [])
+  const login = useCallback(
+    (form) =>
+      client('users/sign_in', {
+        data: {
+          user: form,
+        },
+      }).then((res) =>
+        setUserData((prev) => ({
+          ...prev,
+          data: res.data.user,
+        }))
+      ),
+    []
+  )
 
   const logout = useCallback(() => {
     client('users/sign_out', { method: 'DELETE' }).then(() =>
@@ -58,18 +61,20 @@ function AuthProvider(props) {
     )
   }, [])
 
-  const register = useCallback((form) => {
-    client('users', {
-      data: {
-        user: form,
-      },
-    }).then((res) =>
-      setUserData((prev) => ({
-        ...prev,
-        data: res.data.user,
-      }))
-    )
-  }, [])
+  const register = useCallback(
+    (form) =>
+      client('users', {
+        data: {
+          user: form,
+        },
+      }).then((res) =>
+        setUserData((prev) => ({
+          ...prev,
+          data: res.data.user,
+        }))
+      ),
+    []
+  )
 
   const { data, status, errors } = userData
   const isIdle = status === 'idle'
@@ -87,7 +92,7 @@ function AuthProvider(props) {
   }
 
   if (isIdle || isLoading) {
-    return <div>Loading...</div>
+    return <FullPageSpinner />
   }
 
   return <AuthCtx.Provider value={value} {...props} />

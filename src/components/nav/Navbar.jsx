@@ -2,10 +2,21 @@ import tw from 'twin.macro'
 
 import { faChevronDown, faBell, faUser } from 'lib/fontawsome/icons'
 import { Icon, SearchForm } from 'components/shared'
-import { Menu, MenuList, MenuButton, MenuItem } from '@reach/menu-button'
+import {
+  Menu,
+  MenuList as ReachMenuList,
+  MenuButton as ReactMenuBtn,
+  MenuItem as ReachMenuItem,
+} from '@reach/menu-button'
 import { useAuth } from 'context/authContext'
 
 const Button = tw.button`rounded border-0 bg-transparent py-[6px] px-[10px] cursor-pointer text-white hover:bg-gray-200/30`
+
+const MenuButton = tw(
+  ReactMenuBtn
+)`bg-cyan-500 rounded-full border-0 cursor-pointer w-[32px] h-[32px]`
+const MenuList = tw(ReachMenuList)`w-[300px] mt-[10px]`
+const MenuItem = tw(ReachMenuItem)`hover:text-black hover:bg-gray-300`
 
 function Navbar() {
   const { logout } = useAuth()
@@ -32,11 +43,7 @@ function Navbar() {
         </Button>
         <Menu>
           <MenuButton>
-            <button
-              css={tw`bg-cyan-500 rounded-full border-0 cursor-pointer w-[32px] h-[32px]`}
-            >
-              <Icon name={faUser} css={tw`text-lg text-sky-900`} />
-            </button>
+            <Icon name={faUser} css={tw`text-lg text-sky-900`} />
           </MenuButton>
           <MenuList>
             <div css={tw`px-[10px] mb-[10px] relative`}>

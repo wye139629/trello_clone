@@ -1,7 +1,8 @@
 import tw, { styled } from 'twin.macro'
 
-import { Modal, ModalOpenBtn, ModalContent } from 'components/shared'
+import { Modal, ModalOpenBtn, ModalContent, Spinner } from 'components/shared'
 import { useAuth } from 'context/authContext'
+import { useAsync } from 'lib/hooks'
 import PropTypes from 'prop-types'
 
 const buttonVairants = {
@@ -53,14 +54,18 @@ LoginForm.propTypes = {
 }
 
 function LoginForm({ onSubmit, action }) {
+  const { isLoading, run, isError, errors } = useAsync()
+
   function onSubmitHandler(e) {
     e.preventDefault()
     const { email, password } = e.target.elements
 
-    onSubmit({
-      email: email.value,
-      password: password.value,
-    })
+    run(
+      onSubmit({
+        email: email.value,
+        password: password.value,
+      })
+    )
   }
   return (
     <form css={tw`flex flex-col space-y-[20px]`} onSubmit={onSubmitHandler}>
@@ -71,7 +76,10 @@ function LoginForm({ onSubmit, action }) {
       <ColumnGroup>
         <Input type="password" name="password" placeholder="輸入密碼" />
       </ColumnGroup>
-      <button css={tw`bg-green-600 rounded py-2 text-white`}>{action}</button>
+      <button css={tw`bg-green-600 rounded py-2 text-white text-center`}>
+        {isLoading ? <Spinner /> : action}
+      </button>
+      {isError ? <p css={tw`text-red-500`}>{errors.message}</p> : null}
     </form>
   )
 }

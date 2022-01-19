@@ -57,8 +57,9 @@ export function useAsync(initialState = {}) {
           return data
         },
         (error) => {
-          setError(error)
-          return Promise.reject(error)
+          const { data } = error.response
+          setError(data)
+          return Promise.reject(data)
         }
       )
     },
@@ -73,7 +74,8 @@ export function useAsync(initialState = {}) {
     setError,
     reset,
     run,
-    isLoading: status === 'idle' || status === 'pending',
+    isIdle: status === 'idle',
+    isLoading: status === 'pending',
     isSuccess: status === 'resolved',
     isError: status === 'rejected',
   }
