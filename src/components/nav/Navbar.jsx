@@ -1,25 +1,25 @@
 import tw from 'twin.macro'
 
-import { faChevronDown, faBell, faUser } from 'lib/fontawsome/icons'
-import { Icon, SearchForm } from 'components/shared'
+import { faChevronDown, faBell } from 'lib/fontawsome/icons'
+import { Icon, SearchForm, UserIcon } from 'components/shared'
 import {
   Menu,
   MenuList as ReachMenuList,
-  MenuButton as ReactMenuBtn,
+  MenuButton,
   MenuItem as ReachMenuItem,
 } from '@reach/menu-button'
 import { useAuth } from 'context/authContext'
 
 const Button = tw.button`rounded border-0 bg-transparent py-[6px] px-[10px] cursor-pointer text-white hover:bg-gray-200/30`
 
-const MenuButton = tw(
-  ReactMenuBtn
-)`bg-cyan-500 rounded-full border-0 cursor-pointer w-[32px] h-[32px]`
-const MenuList = tw(ReachMenuList)`w-[300px] mt-[10px]`
+const MenuList = tw(
+  ReachMenuList
+)`w-[300px] mt-[10px] flex flex-col space-y-[10px]`
+
 const MenuItem = tw(ReachMenuItem)`hover:text-black hover:bg-gray-300`
 
 function Navbar() {
-  const { logout } = useAuth()
+  const { logout, user } = useAuth()
 
   return (
     <nav css={tw`flex px-[6px] py-[8px] bg-black/50 text-white items-center`}>
@@ -43,11 +43,19 @@ function Navbar() {
         </Button>
         <Menu>
           <MenuButton>
-            <Icon name={faUser} css={tw`text-lg text-sky-900`} />
+            <UserIcon />
           </MenuButton>
           <MenuList>
-            <div css={tw`px-[10px] mb-[10px] relative`}>
-              <h4 css={tw`text-center border-b pb-[8px]`}>帳號</h4>
+            <div css={tw`px-[10px] relative`}>
+              <h4 css={tw`text-center border-b pb-[10px]`}>帳號</h4>
+            </div>
+            <div css={tw`px-[10px]`}>
+              <div
+                css={tw`flex items-center space-x-[10px] pb-[10px] border-b`}
+              >
+                <UserIcon />
+                <p>{user.email}</p>
+              </div>
             </div>
             <MenuItem onSelect={logout}>登出</MenuItem>
           </MenuList>
