@@ -10,6 +10,9 @@ const ax = axios.create({
   withCredentials: true,
 })
 
+ax.defaults.xsrfCookieName = 'CSRF-TOKEN'
+ax.defaults.xsrfHeaderName = 'X-CSRF-Token'
+
 export function client(
   endpoint,
   { data, headers: customHeaders, ...customConfig } = {}
