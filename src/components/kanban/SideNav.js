@@ -2,6 +2,8 @@ import tw, { css } from 'twin.macro'
 
 import { Icon } from 'components/shared'
 import { faChevronLeft, faChevronRight, faPlus } from 'lib/fontawsome/icons'
+import { useAuth } from 'context/authContext'
+import { NavLink } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
 const activeStyle = css`
@@ -26,6 +28,7 @@ SideNav.propTypes = {
 }
 
 function SideNav({ isOpen, toggleOpen }) {
+  const { user } = useAuth()
   return (
     <nav css={[inActive, isOpen && activeStyle]}>
       <div css={tw`w-full`}>
@@ -52,17 +55,9 @@ function SideNav({ isOpen, toggleOpen }) {
               </Button>
             </div>
             <ul>
-              <li css={tw`bg-sky-100 hover:bg-gray-200/50`}>
-                <a
-                  href="#"
-                  css={tw`flex items-center px-[15px] py-[4px] space-x-2`}
-                >
-                  <div
-                    css={tw`w-[24px] h-[20px] bg-orange-800 rounded-sm`}
-                  ></div>
-                  <span>trello-clone</span>
-                </a>
-              </li>
+              {user.boards.map((board) => (
+                <BoardLink key={board.id} id={board.id} title={board.title} />
+              ))}
             </ul>
           </section>
         </div>
@@ -86,6 +81,25 @@ function SideNav({ isOpen, toggleOpen }) {
         </span>
       </button>
     </nav>
+  )
+}
+
+BoardLink.propTypes = {
+  id: PropTypes.number.isRequired,
+  title: PropTypes.string.isRequired,
+}
+
+function BoardLink({ id, title }) {
+  return (
+    <li css={tw`bg-sky-100 hover:bg-gray-200/50`}>
+      <NavLink
+        to={`/board/${id}`}
+        css={tw`flex items-center px-[15px] py-[4px] space-x-2`}
+      >
+        <div css={tw`w-[24px] h-[20px] bg-orange-800 rounded-sm`}></div>
+        <span>{title}</span>
+      </NavLink>
+    </li>
   )
 }
 

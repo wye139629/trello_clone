@@ -1,11 +1,20 @@
 import tw from 'twin.macro'
 import { useRef, useState } from 'react'
 import { Switcher, Displayer, Editor } from '../shared'
+import { useAuth } from 'context/authContext'
+import { useParams } from 'react-router-dom'
 
 const Button = tw.button`rounded border-0 bg-transparent py-[6px] px-[10px] cursor-pointer hover:bg-gray-200/50 min-h-[40px]`
 
 export function BoardHeader() {
-  const [kanbanTitle, setKanbanTitle] = useState('Trello-clone')
+  const { user } = useAuth()
+  const { boardId } = useParams()
+
+  const [kanbanTitle, setKanbanTitle] = useState(() => {
+    const board = user.boards.find((board) => board.id === Number(boardId))
+    return board.title
+  })
+
   const titleRef = useRef(kanbanTitle)
 
   return (
