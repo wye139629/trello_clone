@@ -2,10 +2,11 @@ import tw, { css, styled } from 'twin.macro'
 
 import { useLayoutEffect, useRef, useState } from 'react'
 import { StatusCard } from './StatusCard'
-import { Icon } from 'components/shared'
+import { Icon, Spinner } from 'components/shared'
 import { faPlus, faTimes } from 'lib/fontawsome/icons'
 import { useClickOutSide } from 'lib/hooks'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
+import { useParams } from 'react-router-dom'
 import { client } from 'lib/api/client'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -20,16 +21,14 @@ export function BoardBody() {
   const [isOpen, setIsOpen] = useState(false)
   const boardContentRef = useRef()
   const addListFormRef = useRef()
+  const { boardId } = useParams()
   useClickOutSide(addListFormRef, () => setIsOpen(false))
-  const { isLoading } = useQuery({
-    queryKey: 'lists',
-    queryFn: () =>
-      client('lists').then((res) => {
-        return res.data
-      }),
+  const { isLoading, data: boardData } = useQuery({
+    queryKey: ['board', boardId],
+    queryFn: () => client(`boards/${boardId}`).then((res) => res.data),
   })
   const queryClient = useQueryClient()
-  const listsCache = queryClient.getQueryData('lists')
+  const boardCache = queryClient.getQueryData(['board', boardId])
 
   const { mutate } = useMutation(
     (newList) => client('lists', { data: newList }),
@@ -37,21 +36,29 @@ export function BoardBody() {
       onMutate: (newList) => {
         const optimisticList = { id: uuidv4(), title: newList.title, todos: [] }
 
-        queryClient.setQueryData('lists', (old) => [...old, optimisticList])
+        queryClient.setQueryData(['board', boardId], (old) => {
+          return { ...old, lists: [...old.lists, optimisticList] }
+        })
 
         return { optimisticList }
       },
       onSuccess: (result, newList, context) => {
-        queryClient.setQueryData('lists', (old) =>
-          old.map((list) =>
+        queryClient.setQueryData(['board', boardId], (old) => {
+          const lists = old.lists.map((list) =>
             list.id === context.optimisticList.id ? result.data : list
           )
-        )
+
+          return { ...old, lists }
+        })
       },
       onError: (error, newList, context) => {
-        queryClient.setQueryData('lists', (old) =>
-          old.filter((list) => list.id !== context.optimisticList.id)
-        )
+        queryClient.setQueryData(['board', boardId], (old) => {
+          const lists = old.lists.filter(
+            (list) => list.id !== context.optimisticList.id
+          )
+
+          return { ...old, lists }
+        })
       },
     }
   )
@@ -61,25 +68,25 @@ export function BoardBody() {
 
     const { current: boardContentEl } = boardContentRef
     boardContentEl.scrollLeft = boardContentEl.scrollWidth
-  }, [isOpen, listsCache])
+  }, [isOpen, boardCache])
 
   function addNewList(e) {
     e.preventDefault()
     const value = e.target.elements['listTitle'].value
     if (value === '') return
 
-    mutate({ title: value })
+    mutate({ title: value, board_id: boardId })
 
     e.target.reset()
   }
 
   if (isLoading) {
-    return <div>loading...</div>
+    return <Spinner />
   }
 
   return (
     <ContentContainer ref={boardContentRef}>
-      {listsCache.map((list, idx) => (
+      {boardData.lists.map((list, idx) => (
         <StatusCard key={list.id} list={list} index={idx} />
       ))}
       {isOpen ? (

@@ -7,6 +7,7 @@ import { useEffect, useRef } from 'react'
 import { Modal, ModalContent, ModalOpenBtn } from '../shared'
 import { TodoInfoPanel } from './TodoInfoPanel'
 import { useMutation, useQueryClient } from 'react-query'
+import { useParams } from 'react-router-dom'
 import { client } from 'lib/api/client'
 
 TodoItem.propTypes = {
@@ -18,28 +19,32 @@ export function TodoItem({ todo, index }) {
   const { title, id } = todo
   const todoRef = useRef()
   const queryClient = useQueryClient()
+  const { boardId } = useParams()
 
   const { mutate: updateTodoMutate } = useMutation(
     (updates) =>
       client(`tasks/${updates.id}`, { method: 'PATCH', data: updates }),
     {
       onMutate: (updates) => {
-        const previous = queryClient.getQueryData('lists')
-        const targetList = previous.find((list) => list.id === updates.list_id)
+        const previous = queryClient.getQueryData(['board', boardId])
+        const targetList = previous.lists.find(
+          (list) => list.id === updates.list_id
+        )
         const nextTodos = targetList.todos.map((todo) =>
           todo.id === id ? { ...todo, ...updates } : todo
         )
 
-        queryClient.setQueryData('lists', (old) =>
-          old.map((list) =>
+        queryClient.setQueryData(['board', boardId], (old) => {
+          const nextLists = old.lists.map((list) =>
             list.id === updates.list_id
               ? { ...targetList, todos: nextTodos }
               : list
           )
-        )
+          return { ...old, lists: nextLists }
+        })
 
         return () => {
-          queryClient.setQueryData('lists', previous)
+          queryClient.setQueryData(['board', boardId], previous)
         }
       },
       onError: (err, updates, onMutateRecover) => {
@@ -76,19 +81,22 @@ export function TodoItem({ todo, index }) {
       if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return
       if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return
 
-      const previous = queryClient.getQueryData('lists')
-      const originList = previous.find((list) => list.id === item.listId)
+      const { lists } = queryClient.getQueryData(['board', boardId])
+      const originList = lists.find((list) => list.id === item.listId)
 
       if (isToSameList) {
         const nextTodos = originList.todos.filter((todo) => todo.id !== dragId)
         nextTodos.splice(hoverIndex, 0, item)
         const nextList = { ...originList, todos: nextTodos }
-        queryClient.setQueryData('lists', (old) =>
-          old.map((list) => (list.id === item.listId ? nextList : list))
-        )
+        queryClient.setQueryData(['board', boardId], (old) => {
+          const nextLists = old.lists.map((list) =>
+            list.id === item.listId ? nextList : list
+          )
+          return { ...old, lists: nextLists }
+        })
       } else {
         const nextTodos = originList.todos.filter((todo) => todo.id !== dragId)
-        const targetList = previous.find((list) => list.id === todo.listId)
+        const targetList = lists.find((list) => list.id === todo.listId)
         const nextTargetTodos = [...targetList.todos]
         nextTargetTodos.splice(hoverIndex, 0, {
           ...item,
@@ -97,13 +105,15 @@ export function TodoItem({ todo, index }) {
         const nextOriginList = { ...originList, todos: nextTodos }
         const nextTargetList = { ...targetList, todos: nextTargetTodos }
 
-        queryClient.setQueryData('lists', (old) =>
-          old.map((list) => {
+        queryClient.setQueryData(['board', boardId], (old) => {
+          const nextLists = old.lists.map((list) => {
             if (list.id === item.listId) return nextOriginList
             if (list.id === todo.listId) return nextTargetList
             return list
           })
-        )
+
+          return { ...old, lists: nextLists }
+        })
       }
 
       item.index = hoverIndex
@@ -124,10 +134,10 @@ export function TodoItem({ todo, index }) {
         return todo.id === monitor.getItem().id
       },
       end(item) {
-        console.log('mutate')
-        const lists = queryClient.getQueryData('lists')
-        const targetList = lists.find((list) => list.id === item.listId)
-        const targetTodos = targetList.todos
+        const { lists } = queryClient.getQueryData(['board', boardId])
+        const { todos: targetTodos } = lists.find(
+          (list) => list.id === item.listId
+        )
         const targetIndex = targetTodos.findIndex((todo) => todo.id === item.id)
         let targetPos
         const previous = targetTodos[targetIndex - 1]

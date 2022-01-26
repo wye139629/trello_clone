@@ -22,10 +22,10 @@ function AuthProvider(props) {
     setUserData((prev) => ({ ...prev, status: 'pending' }))
     client('auth')
       .then((res) => {
-        const { user, boards } = res.data
+        const { user } = res.data
         setUserData((prev) => ({
           ...prev,
-          data: { ...user, boards },
+          data: user,
           status: 'resolved',
         }))
       })
@@ -48,13 +48,10 @@ function AuthProvider(props) {
           user: form,
         },
       }).then((res) => {
-        const { user, boards } = res.data
+        const { user } = res.data
         setUserData((prev) => ({
           ...prev,
-          data: {
-            ...user,
-            boards,
-          },
+          data: user,
         }))
       }),
     []

@@ -1,8 +1,9 @@
 import tw, { css } from 'twin.macro'
 
-import { Icon } from 'components/shared'
+import { Icon, Spinner } from 'components/shared'
 import { faChevronLeft, faChevronRight, faPlus } from 'lib/fontawsome/icons'
-import { useAuth } from 'context/authContext'
+import { useQuery } from 'react-query'
+import { client } from 'lib/api/client'
 import { NavLink } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
@@ -28,7 +29,14 @@ SideNav.propTypes = {
 }
 
 function SideNav({ isOpen, toggleOpen }) {
-  const { user } = useAuth()
+  const { isLoading, data: boards } = useQuery({
+    queryKey: 'boards',
+    queryFn: () =>
+      client('boards').then((res) => {
+        return res.data
+      }),
+  })
+
   return (
     <nav css={[inActive, isOpen && activeStyle]}>
       <div css={tw`w-full`}>
@@ -55,9 +63,13 @@ function SideNav({ isOpen, toggleOpen }) {
               </Button>
             </div>
             <ul>
-              {user.boards.map((board) => (
-                <BoardLink key={board.id} id={board.id} title={board.title} />
-              ))}
+              {isLoading ? (
+                <Spinner />
+              ) : (
+                boards.map((board) => (
+                  <BoardLink key={board.id} id={board.id} title={board.title} />
+                ))
+              )}
             </ul>
           </section>
         </div>
