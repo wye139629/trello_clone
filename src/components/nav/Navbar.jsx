@@ -8,6 +8,7 @@ import {
   MenuButton,
   MenuItem as ReachMenuItem,
 } from '@reach/menu-button'
+import { NavLink } from 'react-router-dom'
 import { useAuth } from 'context/authContext'
 
 const Button = tw.button`rounded border-0 bg-transparent py-[6px] px-[10px] cursor-pointer text-white hover:bg-gray-200/30`
@@ -24,9 +25,9 @@ function Navbar() {
   return (
     <nav css={tw`flex px-[6px] py-[8px] bg-black/50 text-white items-center`}>
       <div>
-        <a href="./">
+        <NavLink to="/">
           <Button>Willo</Button>
-        </a>
+        </NavLink>
       </div>
       <div css={tw`px-2`}>
         <Button>

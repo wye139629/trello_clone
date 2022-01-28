@@ -1,5 +1,5 @@
 import tw from 'twin.macro'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Switcher, Displayer, Editor } from '../shared'
 import { useMutation, useQueryClient } from 'react-query'
 import { useParams } from 'react-router-dom'
@@ -19,6 +19,11 @@ export function BoardHeader() {
 
   const titleRef = useRef(kanbanTitle)
 
+  useEffect(() => {
+    const { title } = boardsCache.find((board) => board.id === Number(boardId))
+    setKanbanTitle(title)
+  }, [boardId, boardsCache])
+
   const { mutate: updateBoardTitle } = useMutation(
     (newBoard) =>
       client(`boards/${boardId}`, { data: newBoard, method: 'PATCH' }),
@@ -37,7 +42,7 @@ export function BoardHeader() {
       <Switcher>
         <Displayer>
           <Button>
-            <h4 css={tw`text-sky-900 text-xl font-extrabold`}>{kanbanTitle}</h4>
+            <h4 css={tw`text-white text-xl font-bold`}>{kanbanTitle}</h4>
           </Button>
         </Displayer>
         <Editor>
@@ -53,8 +58,9 @@ export function BoardHeader() {
             onBlur={(e) => {
               if (e.target.value === '') {
                 setKanbanTitle(titleRef.current)
+              } else {
+                updateBoardTitle({ title: e.target.value })
               }
-              updateBoardTitle({ title: e.target.value })
             }}
           />
         </Editor>

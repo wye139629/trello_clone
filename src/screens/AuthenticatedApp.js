@@ -1,21 +1,16 @@
-import { css } from 'twin.macro'
-import kanbanBg from '/public/images/kanban-bg.jpg'
+import { WorkSpaceScreen } from './WorkSpaceScreen'
+import tw from 'twin.macro'
 
-import Navbar from 'components/nav/Navbar'
-import Kanban from 'components/kanban/Kanban'
-
-const appStyle = css`
-  height: 100vh;
-  background-image: url(${kanbanBg});
-  background-size: cover;
-  background-repeat: no-repeat;
-`
+import KanbanScreen from './KanbanScreen'
+import { Routes, Route } from 'react-router-dom'
 
 export function AuthenticatedApp() {
   return (
-    <div css={appStyle}>
-      <Navbar />
-      <Kanban />
+    <div css={tw`h-screen`}>
+      <Routes>
+        <Route path="/" element={<WorkSpaceScreen />} />
+        <Route path="/board/:boardId" element={<KanbanScreen />} />
+      </Routes>
     </div>
   )
 }

@@ -1,27 +1,32 @@
-import tw, { css } from 'twin.macro'
+import tw, { styled, css } from 'twin.macro'
 
-import { Icon, Spinner } from 'components/shared'
+import { Icon, Modal, ModalOpenBtn, ModalContent } from 'components/shared'
+import { BoardCreate } from './BoardCreate'
 import { faChevronLeft, faChevronRight, faPlus } from 'lib/fontawsome/icons'
-import { useQuery } from 'react-query'
-import { client } from 'lib/api/client'
+import { useQueryClient } from 'react-query'
 import { NavLink } from 'react-router-dom'
+import { colorTypes } from 'lib/data/colors'
 import PropTypes from 'prop-types'
 
-const activeStyle = css`
-  position: relative;
-  transform: translateX(0);
-`
-
-const inActive = css`
-  height: 100%;
-  width: 260px;
-  background-color: white;
-  position: absolute;
-  transform: translateX(-100%);
-  transition: transform 0.2s;
-`
+const Nav = styled.nav(({ isOpen }) => [
+  css`
+    height: 100%;
+    width: 260px;
+    background-color: rgba(255, 255, 255, 0.5);
+    position: absolute;
+    transform: translateX(-100%);
+    transition: transform 0.2s;
+  `,
+  isOpen &&
+    css`
+      position: relative;
+      transform: translateX(0);
+    `,
+])
 
 const Button = tw.button`rounded border-0 bg-transparent w-[32px] h-[32px] cursor-pointer hover:bg-gray-200/80`
+
+const linkActiveStyle = tw`bg-gray-200`
 
 SideNav.propTypes = {
   isOpen: PropTypes.bool.isRequired,
@@ -29,17 +34,12 @@ SideNav.propTypes = {
 }
 
 function SideNav({ isOpen, toggleOpen }) {
-  const { isLoading, data: boards } = useQuery({
-    queryKey: 'boards',
-    queryFn: () =>
-      client('boards').then((res) => {
-        return res.data
-      }),
-  })
+  const queryClient = useQueryClient()
+  const boards = queryClient.getQueryData('boards')
 
   return (
-    <nav css={[inActive, isOpen && activeStyle]}>
-      <div css={tw`w-full`}>
+    <Nav isOpen={isOpen}>
+      <div css={tw`w-full `}>
         <div
           css={tw`flex items-center px-[10px] py-[12px] border-b border-gray-200`}
         >
@@ -54,22 +54,33 @@ function SideNav({ isOpen, toggleOpen }) {
             <Icon name={faChevronLeft} size="sm"></Icon>
           </Button>
         </div>
-        <div css={tw`pt-[12px]`}>
+        <div css={tw`pt-[12px] `}>
           <section>
             <div css={tw`flex items-center pl-[14px] pr-[6px] py-[4px]`}>
               <h4>你的看板</h4>
-              <Button css={tw`ml-auto`}>
-                <Icon name={faPlus} size="sm"></Icon>
-              </Button>
+              <Modal>
+                <ModalOpenBtn>
+                  <Button css={tw`ml-auto`}>
+                    <Icon name={faPlus} size="sm"></Icon>
+                  </Button>
+                </ModalOpenBtn>
+                <ModalContent
+                  aria-label="Create board"
+                  css={tw`px-[30px] pb-[20px] h-[400px]`}
+                >
+                  <BoardCreate />
+                </ModalContent>
+              </Modal>
             </div>
             <ul>
-              {isLoading ? (
-                <Spinner />
-              ) : (
-                boards.map((board) => (
-                  <BoardLink key={board.id} id={board.id} title={board.title} />
-                ))
-              )}
+              {boards.map(({ id, title, color }) => (
+                <BoardLink
+                  key={id}
+                  id={String(id)}
+                  title={title}
+                  color={color}
+                />
+              ))}
             </ul>
           </section>
         </div>
@@ -92,23 +103,30 @@ function SideNav({ isOpen, toggleOpen }) {
           <Icon name={faChevronRight} css={tw`leading-[24px]`} />
         </span>
       </button>
-    </nav>
+    </Nav>
   )
 }
 
 BoardLink.propTypes = {
-  id: PropTypes.number.isRequired,
+  id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
+  color: PropTypes.string.isRequired,
 }
 
-function BoardLink({ id, title }) {
+function BoardLink({ id, title, color }) {
   return (
-    <li css={tw`bg-sky-100 hover:bg-gray-200/50`}>
+    <li css={tw`hover:bg-gray-500/30`}>
       <NavLink
         to={`/board/${id}`}
         css={tw`flex items-center px-[15px] py-[4px] space-x-2`}
+        style={({ isActive }) => (isActive ? linkActiveStyle : undefined)}
       >
-        <div css={tw`w-[24px] h-[20px] bg-orange-800 rounded-sm`}></div>
+        <div
+          css={[
+            tw`w-[24px] h-[20px] bg-orange-800 rounded-sm`,
+            colorTypes[color],
+          ]}
+        ></div>
         <span>{title}</span>
       </NavLink>
     </li>

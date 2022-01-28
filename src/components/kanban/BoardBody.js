@@ -123,7 +123,7 @@ export function BoardBody() {
       ) : (
         <button
           css={[
-            tw`w-[270px] text-sm text-sky-900 space-x-[10px] pl-[20px] py-[10px] self-start rounded bg-gray-500/20 hover:bg-gray-500/50 text-left`,
+            tw`w-[270px] text-sm text-sky-900 space-x-[10px] pl-[20px] py-[10px] self-start rounded bg-gray-300/50 hover:bg-gray-500/50 text-left`,
             css`
               flex-shrink: 0;
             `,

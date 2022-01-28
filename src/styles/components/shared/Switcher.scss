@@ -4,7 +4,7 @@
 
 .hidden {
   @extend .default;
-  @apply z-m1;
+  @apply z-m1 opacity-0;
 }
 
 .isEdit {

@@ -9,13 +9,12 @@ const CONTENT_HASH = isDevMode ? '' : '-[contenthash]'
 
 module.exports = {
   mode: process.env.NODE_ENV,
-  entry: {
-    app: ['./src/index.js'],
-  },
+  entry: ['./src/index.js'],
   output: {
     filename: `[name]${CONTENT_HASH}.js`,
     chunkFilename: `[name]-chunk${CONTENT_HASH}.js`,
     path: path.resolve(__dirname, 'dist'),
+    publicPath: '/',
   },
   resolve: {
     modules: [path.resolve('src'), path.resolve('node_modules')],
@@ -23,6 +22,9 @@ module.exports = {
       '@': path.resolve('src'), // 設定 import 的絕對路徑
     },
     extensions: ['.js', '.json', '.jsx'],
+  },
+  devServer: {
+    historyApiFallback: true,
   },
   module: {
     rules: [
