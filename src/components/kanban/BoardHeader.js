@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from 'react-query'
 import { useParams } from 'react-router-dom'
 import { client } from 'lib/api/client'
 
-const Button = tw.button`rounded border-0 bg-transparent py-[6px] px-[10px] cursor-pointer hover:bg-gray-200/50 min-h-[40px]`
+const Button = tw.button`rounded border-0 bg-transparent px-[14px] py-[6px] cursor-pointer hover:bg-gray-200/50 min-h-[40px]`
 
 export function BoardHeader() {
   const { boardId } = useParams()
@@ -22,6 +22,7 @@ export function BoardHeader() {
   useEffect(() => {
     const { title } = boardsCache.find((board) => board.id === Number(boardId))
     setKanbanTitle(title)
+    titleRef.current = title
   }, [boardId, boardsCache])
 
   const { mutate: updateBoardTitle } = useMutation(
@@ -48,7 +49,7 @@ export function BoardHeader() {
         <Editor>
           <input
             css={[
-              tw`text-sky-900 text-xl font-extrabold px-[8px] py-[6px] min-h-[40px] focus:outline-none focus:border-sky-600 focus:border-[2px] focus:rounded`,
+              tw`text-sky-900 text-xl font-bold pl-[12px] py-[6px] min-h-[40px] focus:outline-none focus:border-sky-600 focus:border-[2px] focus:rounded`,
             ]}
             type="text"
             value={kanbanTitle}
