@@ -3,7 +3,7 @@ import { styled } from 'twin.macro'
 import Navbar from 'components/nav/Navbar'
 import SideNav from 'components/kanban/SideNav'
 import Board from 'components/kanban/Board'
-import { Spinner } from 'components/shared'
+import { FullPageSpinner } from 'components/shared'
 import { useState } from 'react'
 import { useQuery } from 'react-query'
 import { client } from 'lib/api/client'
@@ -27,12 +27,14 @@ function KanbanScreen() {
       }),
   })
 
-  if (isLoading) return <Spinner />
+  if (isLoading) return <FullPageSpinner />
+
   const board = boards.find((board) => board.id === Number(boardId))
 
   function toggleOpen() {
     setIsOpen((prev) => !prev)
   }
+
   return (
     <div css={colorTypes[board.color]}>
       <Navbar />

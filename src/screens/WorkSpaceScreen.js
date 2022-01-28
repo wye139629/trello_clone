@@ -7,7 +7,7 @@ import { colorTypes } from 'lib/data/colors'
 import { Link } from 'react-router-dom'
 import { useQuery } from 'react-query'
 import { client } from 'lib/api/client'
-import { Spinner } from 'components/shared'
+import { FullPageSpinner } from 'components/shared'
 import PropTypes from 'prop-types'
 
 const Container = styled.main`
@@ -43,7 +43,7 @@ export function WorkSpaceScreen() {
       }),
   })
 
-  if (isLoading) return <Spinner />
+  if (isLoading) return <FullPageSpinner />
 
   return (
     <>
