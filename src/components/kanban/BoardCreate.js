@@ -68,7 +68,7 @@ export function BoardCreate() {
       },
     }
   )
-  const isEmpty = kanbanTitle === ''
+  const isEmpty = kanbanTitle.trim() === ''
 
   function onClickHandler(e) {
     setKanbanColor(e.target.title)
@@ -77,8 +77,9 @@ export function BoardCreate() {
   function onSubmitHandler(e) {
     e.preventDefault()
     const { kanbanTitle } = e.target.elements
-    if (kanbanTitle === '') return
-    createBoard({ title: kanbanTitle.value, color: kanbanColor })
+    const title = kanbanTitle.value.trim()
+    if (title === '') return
+    createBoard({ title, color: kanbanColor })
   }
 
   return (

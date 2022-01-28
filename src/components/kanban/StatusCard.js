@@ -300,8 +300,10 @@ export function StatusCard({ list, index }) {
     e.preventDefault()
     const textareaEl = e.target.elements['todoTitle']
     const { value, style } = textareaEl
+    const title = value.trim()
+    if (title === '') return
 
-    addTodoMutate({ title: value, description: '', list_id: id })
+    addTodoMutate({ title, description: '', list_id: id })
 
     style.height = '54px'
     e.target.reset()

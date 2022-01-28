@@ -73,9 +73,10 @@ export function BoardBody() {
   function addNewList(e) {
     e.preventDefault()
     const value = e.target.elements['listTitle'].value
-    if (value === '') return
+    const title = value.trim()
+    if (title === '') return
 
-    mutate({ title: value, board_id: boardId })
+    mutate({ title, board_id: boardId })
 
     e.target.reset()
   }
