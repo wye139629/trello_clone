@@ -18,6 +18,7 @@ import {
   MenuItem as ReachMenuItem,
 } from '@reach/menu-button'
 import { useMutation, useQueryClient } from 'react-query'
+import { useParams } from 'react-router-dom'
 import { client } from 'lib/api/client'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -50,6 +51,7 @@ export function StatusCard({ list, index }) {
   const addTodoBtnRef = useRef()
   const textareaRef = useRef()
   const listRef = useRef()
+  const { boardId } = useParams()
   const todosWrapperRef = useRef()
   const addTodoFormRef = useRef()
   const queryClient = useQueryClient()
@@ -61,23 +63,25 @@ export function StatusCard({ list, index }) {
       client(`lists/${updates.id}`, { data: updates, method: 'PATCH' }),
     {
       onMutate: (newList) => {
-        const previous = queryClient.getQueryData('lists')
+        const previous = queryClient.getQueryData(['board', boardId])
 
-        queryClient.setQueryData('lists', (old) =>
-          old.map((oldList) =>
+        queryClient.setQueryData(['board', boardId], (old) => {
+          const nextLists = old.lists.map((oldList) =>
             oldList.id === newList.id ? { ...oldList, ...newList } : oldList
           )
-        )
+          return { ...old, lists: nextLists }
+        })
         return () => {
-          queryClient.setQueryData('lists', previous)
+          queryClient.setQueryData(['board', boardId], previous)
         }
       },
       onSuccess: (result, newList) => {
-        queryClient.setQueryData('lists', (old) =>
-          old.map((list) =>
+        queryClient.setQueryData(['board', boardId], (old) => {
+          const nextLists = old.lists.map((list) =>
             list.id === newList.id ? { ...list, ...result.data } : list
           )
-        )
+          return { ...old, lists: nextLists }
+        })
       },
       onError: (error, data, onMutateRecover) => {
         alert('Sorry something went wrong, please try again later')
@@ -90,14 +94,17 @@ export function StatusCard({ list, index }) {
     (destroy) => client(`lists/${destroy.id}`, { method: 'DELETE' }),
     {
       onMutate: (destroy) => {
-        const previous = queryClient.getQueryData('lists')
+        const previous = queryClient.getQueryData(['board', boardId])
 
-        queryClient.setQueryData('lists', (old) =>
-          old.filter((oldList) => oldList.id !== destroy.id)
-        )
+        queryClient.setQueryData(['board', boardId], (old) => {
+          const nextLists = old.lists.filter(
+            (oldList) => oldList.id !== destroy.id
+          )
+          return { ...old, lists: nextLists }
+        })
 
         return () => {
-          queryClient.setQueryData('lists', previous)
+          queryClient.setQueryData(['board', boardId], previous)
         }
       },
       onError: (error, destroy, onMutateRecover) => {
@@ -111,22 +118,25 @@ export function StatusCard({ list, index }) {
     (newTodo) => client('tasks', { data: newTodo }),
     {
       onMutate: ({ title, list_id: listId, description }) => {
-        const previous = queryClient.getQueryData('lists')
+        const previous = queryClient.getQueryData(['board', boardId])
 
         const optimisticTodo = { title, listId, description, id: uuidv4() }
-        const targetList = previous.find((list) => list.id === listId)
+        const targetList = previous.lists.find((list) => list.id === listId)
         const optimisticList = {
           ...targetList,
           todos: [...targetList.todos, optimisticTodo],
         }
 
-        queryClient.setQueryData('lists', (old) => {
-          return old.map((list) => (list.id === listId ? optimisticList : list))
+        queryClient.setQueryData(['board', boardId], (old) => {
+          const nextLists = old.lists.map((list) =>
+            list.id === listId ? optimisticList : list
+          )
+          return { ...old, lists: nextLists }
         })
 
         return {
           onMutateRecover: () => {
-            queryClient.setQueryData('lists', previous)
+            queryClient.setQueryData(['board', boardId], previous)
           },
           optimisticList,
           optimisticTodo,
@@ -135,8 +145,8 @@ export function StatusCard({ list, index }) {
       onSuccess: (result, newTodo, context) => {
         const { optimisticList, optimisticTodo } = context
 
-        queryClient.setQueryData('lists', (old) =>
-          old.map((list) =>
+        queryClient.setQueryData(['board', boardId], (old) => {
+          const nextLists = old.lists.map((list) =>
             list.id === optimisticList.id
               ? {
                   ...list,
@@ -146,7 +156,8 @@ export function StatusCard({ list, index }) {
                 }
               : list
           )
-        )
+          return { ...old, lists: nextLists }
+        })
       },
       onError: (error, destroy, onMutateRecover) => {
         alert('Sorry something went wrong, please try again later')
@@ -162,13 +173,11 @@ export function StatusCard({ list, index }) {
         if (item.status === list.id) return
         if (list.todos.length > 0) return
 
-        const previous = queryClient.getQueryData('lists')
-        const originList = previous.find(
-          (oldList) => oldList.id === item.listId
-        )
+        const { lists } = queryClient.getQueryData(['board', boardId])
+        const originList = lists.find((oldList) => oldList.id === item.listId)
 
         const nextTodos = originList.todos.filter((todo) => todo.id !== item.id)
-        const targetList = previous.find((oldList) => oldList.id === list.id)
+        const targetList = lists.find((oldList) => oldList.id === list.id)
         const nextTargetTodos = [
           ...targetList.todos,
           { ...item, listId: targetList.id },
@@ -176,13 +185,15 @@ export function StatusCard({ list, index }) {
         const nextOriginList = { ...originList, todos: nextTodos }
         const nextTargetList = { ...targetList, todos: nextTargetTodos }
 
-        queryClient.setQueryData('lists', (old) =>
-          old.map((oldList) => {
+        queryClient.setQueryData(['board', boardId], (old) => {
+          const nextLists = old.lists.map((oldList) => {
             if (oldList.id === item.listId) return nextOriginList
             if (oldList.id === list.id) return nextTargetList
             return oldList
           })
-        )
+
+          return { ...old, lists: nextLists }
+        })
 
         item.listId = targetList.id
       },
@@ -206,11 +217,14 @@ export function StatusCard({ list, index }) {
         const hoverId = list.id
         if (dragId === hoverId) return
 
-        const oldLists = queryClient.getQueryData('lists')
-        const newList = oldLists.filter((list) => list.id !== dragId)
-        newList.splice(index, 0, item.list)
+        const { lists } = queryClient.getQueryData(['board', boardId])
+        const nextLists = lists.filter((list) => list.id !== dragId)
+        nextLists.splice(index, 0, item.list)
 
-        queryClient.setQueryData('lists', newList)
+        queryClient.setQueryData(['board', boardId], (old) => ({
+          ...old,
+          lists: nextLists,
+        }))
       },
     }),
     [list, index]
@@ -226,7 +240,7 @@ export function StatusCard({ list, index }) {
         isDragging: monitor.isDragging(),
       }),
       end: (item) => {
-        const lists = queryClient.getQueryData('lists')
+        const { lists } = queryClient.getQueryData(['board', boardId])
         const targetIndex = lists.findIndex((list) => list.id === item.list.id)
         if (item.list.index === targetIndex) return
 
@@ -286,8 +300,10 @@ export function StatusCard({ list, index }) {
     e.preventDefault()
     const textareaEl = e.target.elements['todoTitle']
     const { value, style } = textareaEl
+    const title = value.trim()
+    if (title === '') return
 
-    addTodoMutate({ title: value, description: '', list_id: id })
+    addTodoMutate({ title, description: '', list_id: id })
 
     style.height = '54px'
     e.target.reset()
@@ -354,12 +370,7 @@ export function StatusCard({ list, index }) {
           ]}
         >
           {todos.map((todo, idx) => (
-            <TodoItem
-              key={todo.id}
-              index={idx}
-              todo={todo}
-              // taskDispatch={taskDispatch}
-            />
+            <TodoItem key={todo.id} index={idx} todo={todo} />
           ))}
           {isAdding ? (
             <form ref={addTodoFormRef} onSubmit={addNewTodo}>

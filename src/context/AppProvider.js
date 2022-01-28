@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { AuthProvider } from './authContext'
 import PropTypes from 'prop-types'
+import { BrowserRouter as Router } from 'react-router-dom'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,7 +21,9 @@ AppProvider.propTypes = {
 function AppProvider({ children }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>{children}</AuthProvider>
+      <Router>
+        <AuthProvider>{children}</AuthProvider>
+      </Router>
     </QueryClientProvider>
   )
 }

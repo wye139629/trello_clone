@@ -22,7 +22,7 @@ Board.propTypes = {
 function Board({ isOpen }) {
   return (
     <BoardContainer isOpen={isOpen}>
-      <BoardHeader></BoardHeader>
+      <BoardHeader />
       <DndProvider backend={HTML5Backend}>
         <CustomDragLayer />
         <BoardBody />

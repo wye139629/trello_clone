@@ -23,7 +23,11 @@ function AuthProvider(props) {
     client('auth')
       .then((res) => {
         const { user } = res.data
-        setUserData((prev) => ({ ...prev, data: user, status: 'resolved' }))
+        setUserData((prev) => ({
+          ...prev,
+          data: user,
+          status: 'resolved',
+        }))
       })
       .catch((err) => {
         const { data } = err.response
@@ -43,12 +47,13 @@ function AuthProvider(props) {
         data: {
           user: form,
         },
-      }).then((res) =>
+      }).then((res) => {
+        const { user } = res.data
         setUserData((prev) => ({
           ...prev,
-          data: res.data.user,
+          data: user,
         }))
-      ),
+      }),
     []
   )
 

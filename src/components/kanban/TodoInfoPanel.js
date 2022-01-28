@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { ModalDismissBtn, Switcher, Displayer, Editor } from '../shared'
 import { useMutation, useQueryClient } from 'react-query'
 import { client } from 'lib/api/client'
+import { useParams } from 'react-router-dom'
 
 TodoInfoPanel.propTypes = {
   todo: PropTypes.object.isRequired,
@@ -13,28 +14,32 @@ export function TodoInfoPanel({ todo }) {
   const { id, title, listId, description } = todo
   const [editingTitle, setEditingTitle] = useState(title)
   const queryClient = useQueryClient()
+  const { boardId } = useParams()
 
   const { mutate: updateTodoMutate } = useMutation(
     (updates) =>
       client(`tasks/${updates.id}`, { method: 'PATCH', data: updates }),
     {
       onMutate: (updates) => {
-        const previous = queryClient.getQueryData('lists')
-        const targetList = previous.find((list) => list.id === updates.list_id)
+        const previous = queryClient.getQueryData(['board', boardId])
+        const targetList = previous.lists.find(
+          (list) => list.id === updates.list_id
+        )
         const nextTodos = targetList.todos.map((todo) =>
           todo.id === id ? { ...todo, ...updates } : todo
         )
 
-        queryClient.setQueryData('lists', (old) =>
-          old.map((list) =>
+        queryClient.setQueryData(['board', boardId], (old) => {
+          const nextLists = old.lists.map((list) =>
             list.id === updates.list_id
               ? { ...targetList, todos: nextTodos }
               : list
           )
-        )
+          return { ...old, lists: nextLists }
+        })
 
         return () => {
-          queryClient.setQueryData('lists', previous)
+          queryClient.setQueryData(['board', boardId], previous)
         }
       },
       onError: (err, updates, onMutateRecover) => {
@@ -47,20 +52,24 @@ export function TodoInfoPanel({ todo }) {
     (destroy) => client(`tasks/${destroy.id}`, { method: 'DELETE' }),
     {
       onMutate: (destroy) => {
-        const previous = queryClient.getQueryData('lists')
-        const targetList = previous.find((list) => list.id === destroy.list_id)
+        const previous = queryClient.getQueryData(['board', boardId])
+        const targetList = previous.lists.find(
+          (list) => list.id === destroy.list_id
+        )
         const nextTodos = targetList.todos.filter((todo) => todo.id !== id)
 
-        queryClient.setQueryData('lists', (old) =>
-          old.map((list) =>
+        queryClient.setQueryData(['board', boardId], (old) => {
+          const nextLists = old.lists.map((list) =>
             list.id === destroy.list_id
               ? { ...targetList, todos: nextTodos }
               : list
           )
-        )
+
+          return { ...old, lists: nextLists }
+        })
 
         return () => {
-          queryClient.setQueryData('lists', previous)
+          queryClient.setQueryData(['board', boardId], previous)
         }
       },
       onError: (err, updates, onMutateRecover) => {

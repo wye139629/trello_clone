@@ -4,7 +4,9 @@ import { Icon } from './'
 
 const spinnerStyle = css`
   display: block;
+  width: min-content;
   animation: spin 1s linear infinite;
+  margin: 0 auto;
 
   @keyframes spin {
     0% {
