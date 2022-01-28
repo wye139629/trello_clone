@@ -57,10 +57,12 @@ export function BoardHeader() {
               setKanbanTitle(e.target.value)
             }}
             onBlur={(e) => {
-              if (e.target.value === '') {
+              const { value } = e.target
+              const title = value.trim()
+              if (title === '') {
                 setKanbanTitle(titleRef.current)
               } else {
-                updateBoardTitle({ title: e.target.value })
+                updateBoardTitle({ title })
               }
             }}
           />
