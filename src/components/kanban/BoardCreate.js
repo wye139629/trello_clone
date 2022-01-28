@@ -2,7 +2,7 @@ import tw from 'twin.macro'
 
 import { colors } from 'lib/data/colors'
 import { faCheck } from 'lib/fontawsome/icons'
-import { Icon, Spinner } from 'components/shared'
+import { Icon, Spinner, useModalState } from 'components/shared'
 import { useState } from 'react'
 import { useMutation, useQueryClient } from 'react-query'
 import { client } from 'lib/api/client'
@@ -38,6 +38,7 @@ export function BoardCreate() {
   const [kanbanColor, setKanbanColor] = useState('Red')
   const [kanbanTitle, setKanbanTitle] = useState('')
   const navigateTo = useNavigate()
+  const [, setIsOpen] = useModalState()
   const queryClient = useQueryClient()
   const { mutate: createBoard, isLoading } = useMutation(
     (newBoard) => client('boards', { data: { board: newBoard } }),
@@ -57,6 +58,7 @@ export function BoardCreate() {
             board.id === context.optimisticBoard.id ? result.data : board
           )
         })
+        setIsOpen(false)
         navigateTo(`/board/${result.data.id}`)
       },
       onError: (error, newList, context) => {

@@ -66,4 +66,12 @@ function ModalContent({ children, ...props }) {
   )
 }
 
-export { Modal, ModalOpenBtn, ModalDismissBtn, ModalContent }
+function useModalState() {
+  const context = useContext(ModalCtx)
+
+  if (!context) throw new Error(`useModalState must used within Modal Context`)
+
+  return context
+}
+
+export { Modal, ModalOpenBtn, ModalDismissBtn, ModalContent, useModalState }
