@@ -369,9 +369,10 @@ export function StatusCard({ list, index }) {
             `,
           ]}
         >
-          {todos.map((todo, idx) => (
-            <TodoItem key={todo.id} index={idx} todo={todo} />
-          ))}
+          {todos.map((todo, idx) => {
+            const withListTodo = { ...todo, listTitle: cardTitle }
+            return <TodoItem key={todo.id} index={idx} todo={withListTodo} />
+          })}
           {isAdding ? (
             <form ref={addTodoFormRef} onSubmit={addNewTodo}>
               <div

@@ -11,7 +11,7 @@ TodoInfoPanel.propTypes = {
 }
 
 export function TodoInfoPanel({ todo }) {
-  const { id, title, listId, description } = todo
+  const { id, title, listId, listTitle, description } = todo
   const [editingTitle, setEditingTitle] = useState(title)
   const titleRef = useRef(title)
   const queryClient = useQueryClient()
@@ -123,7 +123,7 @@ export function TodoInfoPanel({ todo }) {
           </Switcher>
         </div>
         <span css={tw`px-[10px] text-sm text-gray-500`}>
-          在「{listId}」列表中
+          在「{listTitle}」列表中
         </span>
       </div>
       <div css={tw`flex`}>
