@@ -2,23 +2,24 @@ import tw from 'twin.macro'
 
 import { colors } from 'lib/data/colors'
 import { faCheck } from 'lib/fontawsome/icons'
-import { Icon } from 'components/shared'
+import { Icon, Spinner } from 'components/shared'
 import { useState } from 'react'
 import { useMutation, useQueryClient } from 'react-query'
 import { client } from 'lib/api/client'
 import { v4 as uuidv4 } from 'uuid'
+import { useNavigate } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
 ColorItem.propTypes = {
   title: PropTypes.string.isRequired,
-  color: PropTypes.object,
+  colorStyle: PropTypes.object,
   isSelected: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
 }
 
-function ColorItem({ title, color, isSelected, onClick }) {
+function ColorItem({ title, colorStyle, isSelected, onClick }) {
   return (
-    <li css={[tw`w-[80px] h-[64px] rounded-md`, color]}>
+    <li css={[tw`w-[80px] h-[64px] rounded-md`, colorStyle]}>
       <button
         title={title}
         css={[
@@ -36,8 +37,9 @@ function ColorItem({ title, color, isSelected, onClick }) {
 export function BoardCreate() {
   const [kanbanColor, setKanbanColor] = useState('Red')
   const [kanbanTitle, setKanbanTitle] = useState('')
+  const navigateTo = useNavigate()
   const queryClient = useQueryClient()
-  const { mutate: createBoard } = useMutation(
+  const { mutate: createBoard, isLoading } = useMutation(
     (newBoard) => client('boards', { data: { board: newBoard } }),
     {
       onMutate: (newBoard) => {
@@ -55,6 +57,7 @@ export function BoardCreate() {
             board.id === context.optimisticBoard.id ? result.data : board
           )
         })
+        navigateTo(`/board/${result.data.id}`)
       },
       onError: (error, newList, context) => {
         queryClient.setQueryData('boards', (old) => {
@@ -87,7 +90,7 @@ export function BoardCreate() {
               <ColorItem
                 key={title}
                 title={title}
-                color={color}
+                colorStyle={color}
                 isSelected={title === kanbanColor}
                 onClick={onClickHandler}
               />
@@ -108,11 +111,11 @@ export function BoardCreate() {
           </div>
           <button
             css={[
-              tw`rounded py-[8px] bg-sky-800 text-white w-full`,
+              tw`rounded py-[8px] bg-sky-700 text-white w-full`,
               isEmpty && tw`pointer-events-none bg-gray-300`,
             ]}
           >
-            建立
+            {isLoading ? <Spinner /> : '建立 '}
           </button>
         </form>
       </div>

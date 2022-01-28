@@ -28,9 +28,35 @@ const Button = tw.button`rounded border-0 bg-transparent w-[32px] h-[32px] curso
 
 const linkActiveStyle = tw`bg-gray-200`
 
+BoardLink.propTypes = {
+  id: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  color: PropTypes.string.isRequired,
+}
+
 SideNav.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   toggleOpen: PropTypes.func.isRequired,
+}
+
+function BoardLink({ id, title, color }) {
+  return (
+    <li css={tw`hover:bg-gray-500/30`}>
+      <NavLink
+        to={`/board/${id}`}
+        css={tw`flex items-center px-[15px] py-[4px] space-x-2`}
+        style={({ isActive }) => (isActive ? linkActiveStyle : undefined)}
+      >
+        <div
+          css={[
+            tw`w-[24px] h-[20px] bg-orange-800 rounded-sm`,
+            colorTypes[color],
+          ]}
+        ></div>
+        <span>{title}</span>
+      </NavLink>
+    </li>
+  )
 }
 
 function SideNav({ isOpen, toggleOpen }) {
@@ -104,32 +130,6 @@ function SideNav({ isOpen, toggleOpen }) {
         </span>
       </button>
     </Nav>
-  )
-}
-
-BoardLink.propTypes = {
-  id: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  color: PropTypes.string.isRequired,
-}
-
-function BoardLink({ id, title, color }) {
-  return (
-    <li css={tw`hover:bg-gray-500/30`}>
-      <NavLink
-        to={`/board/${id}`}
-        css={tw`flex items-center px-[15px] py-[4px] space-x-2`}
-        style={({ isActive }) => (isActive ? linkActiveStyle : undefined)}
-      >
-        <div
-          css={[
-            tw`w-[24px] h-[20px] bg-orange-800 rounded-sm`,
-            colorTypes[color],
-          ]}
-        ></div>
-        <span>{title}</span>
-      </NavLink>
-    </li>
   )
 }
 

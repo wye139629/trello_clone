@@ -8,7 +8,7 @@ import {
   MenuButton,
   MenuItem as ReachMenuItem,
 } from '@reach/menu-button'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from 'context/authContext'
 
 const Button = tw.button`rounded border-0 bg-transparent py-[6px] px-[10px] cursor-pointer text-white hover:bg-gray-200/30`
@@ -21,9 +21,16 @@ const MenuItem = tw(ReachMenuItem)`hover:text-black hover:bg-gray-300`
 
 function Navbar() {
   const { logout, user } = useAuth()
+  const { pathname } = useLocation()
+  const isRoot = pathname === '/'
 
   return (
-    <nav css={tw`flex px-[6px] py-[8px] bg-black/50 text-white items-center`}>
+    <nav
+      css={[
+        tw`flex px-[6px] py-[8px] text-white items-center`,
+        isRoot ? tw`bg-sky-700` : tw`bg-black/50`,
+      ]}
+    >
       <div>
         <NavLink to="/">
           <Button>Willo</Button>
