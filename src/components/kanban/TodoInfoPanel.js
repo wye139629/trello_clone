@@ -1,6 +1,6 @@
 import tw from 'twin.macro'
 import PropTypes from 'prop-types'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { ModalDismissBtn, Switcher, Displayer, Editor } from '../shared'
 import { useMutation, useQueryClient } from 'react-query'
 import { client } from 'lib/api/client'
@@ -11,10 +11,15 @@ TodoInfoPanel.propTypes = {
 }
 
 export function TodoInfoPanel({ todo }) {
-  const { id, title, listId, description } = todo
+  const { id, title, listId, listTitle, description } = todo
   const [editingTitle, setEditingTitle] = useState(title)
+  const titleRef = useRef(title)
   const queryClient = useQueryClient()
   const { boardId } = useParams()
+
+  useEffect(() => {
+    titleRef.current = title
+  }, [title])
 
   const { mutate: updateTodoMutate } = useMutation(
     (updates) =>
@@ -91,28 +96,34 @@ export function TodoInfoPanel({ todo }) {
         <div css={tw`text-sky-900`}>
           <Switcher>
             <Displayer>
-              <h4 css={tw`break-words px-[10px] py-[4px] text-lg`}>
+              <h4 css={tw`min-h-[36px] break-words px-[10px] py-[4px] text-lg`}>
                 {editingTitle}
               </h4>
             </Displayer>
             <Editor>
               <textarea
-                defaultValue={title}
-                css={tw`resize-none break-words text-lg px-[10px] py-[4px]`}
+                value={editingTitle}
+                css={tw`min-h-[36px] resize-none break-words text-lg px-[10px] py-[4px]`}
                 onChange={(e) => setEditingTitle(e.target.value)}
-                onBlur={(e) =>
-                  updateTodoMutate({
-                    id,
-                    title: e.target.value,
-                    list_id: listId,
-                  })
-                }
+                onBlur={(e) => {
+                  const { value } = e.target
+                  const title = value.trim()
+                  if (title === '') {
+                    setEditingTitle(titleRef.current)
+                  } else {
+                    updateTodoMutate({
+                      id,
+                      title,
+                      list_id: listId,
+                    })
+                  }
+                }}
               />
             </Editor>
           </Switcher>
         </div>
         <span css={tw`px-[10px] text-sm text-gray-500`}>
-          在「{listId}」列表中
+          在「{listTitle}」列表中
         </span>
       </div>
       <div css={tw`flex`}>

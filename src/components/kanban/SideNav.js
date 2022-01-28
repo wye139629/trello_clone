@@ -50,10 +50,13 @@ function BoardLink({ id, title, color }) {
         <div
           css={[
             tw`w-[24px] h-[20px] bg-orange-800 rounded-sm`,
+            css`
+              flex-shrink: 0;
+            `,
             colorTypes[color],
           ]}
         ></div>
-        <span>{title}</span>
+        <span css={tw`truncate`}>{title}</span>
       </NavLink>
     </li>
   )
