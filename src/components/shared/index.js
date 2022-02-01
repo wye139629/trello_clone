@@ -12,3 +12,4 @@ export {
 export { Spinner } from './Spinner'
 export { FullPageSpinner } from './FullPageSpinner'
 export { UserIcon } from './UserIcon'
+export { Message } from './Message'
