@@ -1,6 +1,12 @@
 import tw, { styled } from 'twin.macro'
 
-import { Modal, ModalOpenBtn, ModalContent, Spinner } from 'components/shared'
+import {
+  Modal,
+  ModalOpenBtn,
+  ModalContent,
+  Spinner,
+  Message,
+} from 'components/shared'
 import { useAuth } from 'context/authContext'
 import { useAsync } from 'lib/hooks'
 import PropTypes from 'prop-types'
@@ -79,7 +85,7 @@ function LoginForm({ onSubmit, action }) {
       <button css={tw`bg-green-600 rounded py-2 text-white text-center`}>
         {isLoading ? <Spinner /> : action}
       </button>
-      {isError ? <p css={tw`text-red-500`}>{errors.message}</p> : null}
+      {isError ? <Message message={errors.message} type="error" /> : null}
     </form>
   )
 }

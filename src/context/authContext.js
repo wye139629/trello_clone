@@ -1,45 +1,27 @@
-import {
-  useState,
-  useEffect,
-  useCallback,
-  useContext,
-  createContext,
-} from 'react'
+import { useEffect, useCallback, useContext, createContext } from 'react'
 import { client } from 'lib/api/client'
+import { useAsync } from 'lib/hooks'
+import { useQueryClient } from 'react-query'
+import { useNavigate } from 'react-router-dom'
 import { FullPageSpinner } from 'components/shared'
 
 const AuthCtx = createContext()
 AuthCtx.displayName = 'AuthContext'
 
+function getUser() {
+  return client('auth').then((res) => res.data)
+}
+
+const userPromise = getUser()
+
 function AuthProvider(props) {
-  const [userData, setUserData] = useState({
-    data: null,
-    status: 'idle',
-    errors: null,
-  })
+  const queryClient = useQueryClient()
+  const navigateTo = useNavigate()
+  const { isIdle, isLoading, isError, data, errors, run, setData } = useAsync()
 
   useEffect(() => {
-    setUserData((prev) => ({ ...prev, status: 'pending' }))
-    client('auth')
-      .then((res) => {
-        const { user } = res.data
-        setUserData((prev) => ({
-          ...prev,
-          data: user,
-          status: 'resolved',
-        }))
-      })
-      .catch((err) => {
-        const { data } = err.response
-        setUserData((prev) => ({
-          ...prev,
-          errors: {
-            message: data.error,
-          },
-          status: 'rejected',
-        }))
-      })
-  }, [])
+    run(userPromise)
+  }, [run])
 
   const login = useCallback(
     (form) =>
@@ -48,23 +30,17 @@ function AuthProvider(props) {
           user: form,
         },
       }).then((res) => {
-        const { user } = res.data
-        setUserData((prev) => ({
-          ...prev,
-          data: user,
-        }))
+        setData(res.data)
       }),
-    []
+    [setData]
   )
-
   const logout = useCallback(() => {
-    client('users/sign_out', { method: 'DELETE' }).then(() =>
-      setUserData((prev) => ({
-        ...prev,
-        data: null,
-      }))
-    )
-  }, [])
+    client('users/sign_out', { method: 'DELETE' }).then(() => {
+      queryClient.clear()
+      setData(null)
+      navigateTo('/')
+    })
+  }, [setData, queryClient, navigateTo])
 
   const register = useCallback(
     (form) =>
@@ -72,20 +48,9 @@ function AuthProvider(props) {
         data: {
           user: form,
         },
-      }).then((res) =>
-        setUserData((prev) => ({
-          ...prev,
-          data: res.data.user,
-        }))
-      ),
-    []
+      }).then((res) => setData(res.data)),
+    [setData]
   )
-
-  const { data, status, errors } = userData
-  const isIdle = status === 'idle'
-  const isLoading = status === 'pending'
-  const isError = status === 'rejected'
-  // const isSuccess = status === 'resolved'
 
   const value = {
     user: data,

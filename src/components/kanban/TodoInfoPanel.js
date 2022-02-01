@@ -1,7 +1,15 @@
 import tw from 'twin.macro'
+
 import PropTypes from 'prop-types'
 import { useState, useRef, useEffect } from 'react'
-import { ModalDismissBtn, Switcher, Displayer, Editor } from '../shared'
+import {
+  ModalDismissBtn,
+  Switcher,
+  Displayer,
+  Editor,
+  Spinner,
+  Message,
+} from '../shared'
 import { useMutation, useQueryClient } from 'react-query'
 import { client } from 'lib/api/client'
 import { useParams } from 'react-router-dom'
@@ -21,7 +29,12 @@ export function TodoInfoPanel({ todo }) {
     titleRef.current = title
   }, [title])
 
-  const { mutate: updateTodoMutate } = useMutation(
+  const {
+    mutate: updateTodoMutate,
+    isError,
+    isLoading,
+    isSuccess,
+  } = useMutation(
     (updates) =>
       client(`tasks/${updates.id}`, { method: 'PATCH', data: updates }),
     {
@@ -136,11 +149,20 @@ export function TodoInfoPanel({ todo }) {
               css={tw`border-sky-600 border-2 rounded resize-none break-words text-sm w-full min-h-[100px] px-[10px] py-[6px] focus:outline-none`}
               placeholder="新增更詳細的描述..."
             ></textarea>
-            <button
-              css={tw`bg-sky-600 text-white rounded px-[12px] py-[6px] text-[14px]`}
-            >
-              儲存
-            </button>
+            <div css={tw`flex items-center space-x-[10px]`}>
+              <button
+                css={[
+                  tw`w-[52px] h-[33px] bg-sky-600 text-white rounded px-[12px] py-[6px] text-[14px]`,
+                  isLoading && tw`text-black pointer-events-none bg-gray-300 `,
+                ]}
+              >
+                {isLoading ? <Spinner /> : '儲存'}
+              </button>
+              {isSuccess && <Message message="儲存成功!" type="success" />}
+              {isError && (
+                <Message message="儲存失敗, 請稍候再試!" type="error" />
+              )}
+            </div>
           </form>
         </div>
         <div css={tw`w-1/6 mx-auto space-y-3`}>
