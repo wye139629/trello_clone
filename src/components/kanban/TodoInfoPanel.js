@@ -139,8 +139,8 @@ export function TodoInfoPanel({ todo }) {
           在「{listTitle}」列表中
         </span>
       </div>
-      <div css={tw`flex`}>
-        <div css={tw`px-[10px] w-4/5 space-y-3`}>
+      <div css={tw`md:flex`}>
+        <div css={tw`px-[10px] md:w-4/5 space-y-3`}>
           <h4>描述</h4>
           <form onSubmit={saveDescritpion}>
             <textarea
@@ -165,11 +165,11 @@ export function TodoInfoPanel({ todo }) {
             </div>
           </form>
         </div>
-        <div css={tw`w-1/6 mx-auto space-y-3`}>
+        <div css={tw`p-[10px] md:p-0 md:w-1/6 md:mx-auto space-y-3`}>
           <h4>其他</h4>
           <ModalDismissBtn>
             <button
-              css={tw`bg-red-700 text-white text-[14px] w-full rounded px-[12px] py-[6px]`}
+              css={tw`bg-red-700 text-white text-[14px] min-w-[52px] md:w-full rounded px-[12px] py-[6px]`}
               onClick={() => {
                 alert('Are you sure want to delete this todo?')
                 deleteTodoMutate({ id, list_id: listId })

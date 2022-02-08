@@ -36,14 +36,14 @@ function Navbar() {
           <Button>Willo</Button>
         </NavLink>
       </div>
-      <div css={tw`px-2`}>
+      <div css={tw`px-2 min-w-[90px]`}>
         <Button>
           <span>工作區</span>
           <Icon name={faChevronDown} css={tw`ml-[8px]`} />
         </Button>
       </div>
       <div css={tw`ml-auto flex items-center space-x-2`}>
-        <div css={tw`w-64`}>
+        <div css={tw`hidden sm:block w-64`}>
           <SearchForm />
         </div>
         <Button>

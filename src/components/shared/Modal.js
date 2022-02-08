@@ -1,4 +1,4 @@
-import tw, { styled } from 'twin.macro'
+import tw from 'twin.macro'
 import '@reach/dialog/styles.css'
 
 import { faTimes } from 'lib/fontawsome/icons'
@@ -8,13 +8,9 @@ import { callAll } from 'lib/callAll'
 import { useState, useContext, createContext, cloneElement } from 'react'
 import PropTypes from 'prop-types'
 
-const Dialog = styled(ReachDialog)({
-  position: 'relative',
-  borderRadius: '3px',
-  padding: '10px 45px 10px 12px',
-  width: '768px',
-  backgroundColor: '#f4f5f7',
-})
+const Dialog = tw(
+  ReachDialog
+)`relative rounded py-[10px] pr-[45px] pl-[12px] w-4/5 max-w-screen-md`
 
 const ModalCtx = createContext()
 

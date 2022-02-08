@@ -19,7 +19,7 @@ ColorItem.propTypes = {
 
 function ColorItem({ title, colorStyle, isSelected, onClick }) {
   return (
-    <li css={[tw`w-[80px] h-[64px] rounded-md`, colorStyle]}>
+    <li css={[tw`min-w-[80px] w-[80px] h-[64px] rounded-md`, colorStyle]}>
       <button
         title={title}
         css={[
@@ -88,7 +88,7 @@ export function BoardCreate() {
       <div css={tw`flex flex-col space-y-[25px]`}>
         <div>
           <h5 css={tw`py-[10px]`}>背景</h5>
-          <ul css={tw`flex space-x-[10px]`}>
+          <ul css={tw`flex space-x-[10px] overflow-auto pb-[15px]`}>
             {colors.map(({ title, color }) => (
               <ColorItem
                 key={title}
@@ -108,7 +108,10 @@ export function BoardCreate() {
               type="text"
               value={kanbanTitle}
               onChange={(e) => setKanbanTitle(e.target.value)}
-              css={tw`border-2 border-rose-600 focus:outline-none focus:border-2 focus:border-sky-500 rounded px-[10px] py-[6px]`}
+              css={[
+                tw`border-2 border-rose-600 focus:outline-none focus:border-2 focus:border-sky-500 rounded px-[10px] py-[6px]`,
+                !isEmpty && tw`border-sky-500`,
+              ]}
               autoFocus
             />
           </div>

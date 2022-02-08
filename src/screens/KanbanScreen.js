@@ -17,7 +17,7 @@ const KanBan = styled.main`
 `
 
 function KanbanScreen() {
-  const [isOpen, setIsOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(false)
   const { boardId } = useParams()
   const { isLoading, data: boards } = useQuery({
     queryKey: 'boards',
