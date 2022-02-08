@@ -16,7 +16,7 @@ const Container = styled.main`
   background-color: rgba(211, 211, 211, 0.1);
 `
 
-const cardStyle = tw`rounded w-[200px] h-[100px] my-[15px] mx-[10px]`
+const cardStyle = tw`rounded w-full md:w-[200px] h-[100px] my-[15px] md:mx-[10px]`
 
 BoardCard.propTypes = {
   id: PropTypes.string.isRequired,
@@ -27,8 +27,8 @@ BoardCard.propTypes = {
 function BoardCard({ id, title, color }) {
   return (
     <Link to={`/board/${id}`}>
-      <div css={[tw` p-[10px]`, cardStyle, colorTypes[color]]}>
-        <h3 css={tw`text-white font-bold`}>{title}</h3>
+      <div css={[tw`p-[10px]`, cardStyle, colorTypes[color]]}>
+        <h3 css={tw`text-white font-bold truncate`}>{title}</h3>
       </div>
     </Link>
   )
@@ -51,7 +51,7 @@ export function WorkSpaceScreen() {
       <Container>
         <div css={tw`max-w-screen-lg mx-auto px-[20px]`}>
           <h3 css={tw`text-lg text-sky-900 font-bold`}>工作區看板</h3>
-          <div css={tw`flex flex-wrap mx-[-10px]`}>
+          <div css={tw`md:flex md:flex-wrap md:mx-[-10px]`}>
             {boards.map(({ id, title, color }) => (
               <BoardCard key={id} id={String(id)} title={title} color={color} />
             ))}

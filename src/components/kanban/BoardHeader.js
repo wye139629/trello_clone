@@ -39,11 +39,15 @@ export function BoardHeader() {
   )
 
   return (
-    <div css={tw`h-[52px] flex items-center px-[8px]`}>
+    <div css={tw`overflow-auto h-[52px] flex items-center px-[8px]`}>
       <Switcher>
         <Displayer>
           <Button>
-            <h4 css={tw`text-white text-xl font-bold`}>{kanbanTitle}</h4>
+            <h4
+              css={tw`max-w-[250px] md:max-w-screen-md truncate text-white text-xl font-bold`}
+            >
+              {kanbanTitle}
+            </h4>
           </Button>
         </Displayer>
         <Editor>
