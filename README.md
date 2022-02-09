@@ -1,5 +1,7 @@
 # Willo
 
+![](https://i.imgur.com/EZb37DW.png)
+
 **Demo: https://trello-clone-sigma.vercel.app/**
 
 ---
@@ -38,6 +40,9 @@
 
 1. 瀏覽：使用者可以切換自己所創建的看板
 2. 新增：可以加入標題與選擇看板背景顏色
+
+![](https://i.imgur.com/stDj1rt.png)
+
 3. 編輯：可修改看板標題
 
 ### 任務清單
@@ -57,6 +62,8 @@
 
 - 可修改任務的標題以及編輯任務的內文
 - 可拖拉任務至不同的順序或不同的任務清單
+
+![](https://i.imgur.com/7hJcScq.png)
 
 3. 刪除任務
 
