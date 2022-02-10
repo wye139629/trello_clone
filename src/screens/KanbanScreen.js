@@ -16,13 +16,13 @@ const KanBan = styled.main`
   position: relative;
 `
 
-function KanbanScreen() {
+export function KanbanScreen() {
   const [isOpen, setIsOpen] = useState(false)
   const { boardId } = useParams()
   const { isLoading, data: boards } = useQuery({
     queryKey: 'boards',
     queryFn: () =>
-      client('boards').then((res) => {
+      client('/boards').then((res) => {
         return res.data
       }),
   })
@@ -45,5 +45,3 @@ function KanbanScreen() {
     </div>
   )
 }
-
-export default KanbanScreen

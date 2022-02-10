@@ -38,7 +38,7 @@ export function WorkSpaceScreen() {
   const { isLoading, data: boards } = useQuery({
     queryKey: 'boards',
     queryFn: () =>
-      client('boards').then((res) => {
+      client('/boards').then((res) => {
         return res.data
       }),
   })

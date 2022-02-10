@@ -41,7 +41,7 @@ export function BoardCreate() {
   const [, setIsOpen] = useModalState()
   const queryClient = useQueryClient()
   const { mutate: createBoard, isLoading } = useMutation(
-    (newBoard) => client('boards', { data: { board: newBoard } }),
+    (newBoard) => client('/boards', { data: { board: newBoard } }),
     {
       onMutate: (newBoard) => {
         const optimisticBoard = { id: uuidv4(), ...newBoard }

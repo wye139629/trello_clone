@@ -9,10 +9,8 @@ const AuthCtx = createContext()
 AuthCtx.displayName = 'AuthContext'
 
 function getUser() {
-  return client('auth').then((res) => res.data)
+  return client('/auth').then((res) => res.data)
 }
-
-const userPromise = getUser()
 
 function AuthProvider(props) {
   const queryClient = useQueryClient()
@@ -20,12 +18,12 @@ function AuthProvider(props) {
   const { isIdle, isLoading, isError, data, errors, run, setData } = useAsync()
 
   useEffect(() => {
-    run(userPromise)
+    run(getUser())
   }, [run])
 
   const login = useCallback(
     (form) =>
-      client('users/sign_in', {
+      client('/users/sign_in', {
         data: {
           user: form,
         },
@@ -35,7 +33,7 @@ function AuthProvider(props) {
     [setData]
   )
   const logout = useCallback(() => {
-    client('users/sign_out', { method: 'DELETE' }).then(() => {
+    client('/users/sign_out', { method: 'DELETE' }).then(() => {
       queryClient.clear()
       setData(null)
       navigateTo('/')
@@ -44,7 +42,7 @@ function AuthProvider(props) {
 
   const register = useCallback(
     (form) =>
-      client('users', {
+      client('/users', {
         data: {
           user: form,
         },
