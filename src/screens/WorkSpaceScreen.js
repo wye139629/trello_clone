@@ -5,8 +5,9 @@ import { Modal, ModalOpenBtn, ModalContent } from 'components/shared'
 import { BoardCreate } from 'components/kanban/BoardCreate'
 import { colorTypes } from 'lib/data/colors'
 import { Link } from 'react-router-dom'
-import { useQuery } from 'react-query'
-import { client } from 'lib/api/client'
+import { useQueryClient } from 'react-query'
+import { useBoardsQuery } from 'lib/hooks'
+import { fetchBoard } from 'lib/api/fetchers'
 import { FullPageSpinner } from 'components/shared'
 import PropTypes from 'prop-types'
 
@@ -25,8 +26,12 @@ BoardCard.propTypes = {
 }
 
 function BoardCard({ id, title, color }) {
+  const queryClient = useQueryClient()
+  const preFetchBoard = async () => {
+    await queryClient.prefetchQuery(['board', id], fetchBoard(id))
+  }
   return (
-    <Link to={`/board/${id}`}>
+    <Link to={`/board/${id}`} onMouseEnter={preFetchBoard}>
       <div css={[tw`p-[10px]`, cardStyle, colorTypes[color]]}>
         <h3 css={tw`text-white font-bold truncate`}>{title}</h3>
       </div>
@@ -35,13 +40,7 @@ function BoardCard({ id, title, color }) {
 }
 
 export function WorkSpaceScreen() {
-  const { isLoading, data: boards } = useQuery({
-    queryKey: 'boards',
-    queryFn: () =>
-      client('/boards').then((res) => {
-        return res.data
-      }),
-  })
+  const { isLoading, data: boards } = useBoardsQuery()
 
   if (isLoading) return <FullPageSpinner />
 
