@@ -1,4 +1,4 @@
 export { useAsync } from './useAsync'
 export { useClickOutSide } from './useClickOutSide'
 export { useSafeDispatch } from './useSafeDispatch'
-export { useBoardsQuery } from './useBoardsQuery'
+export { useBoardsQuery, usePrefetchboard } from './boardsQuery'

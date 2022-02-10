@@ -5,9 +5,7 @@ import { Modal, ModalOpenBtn, ModalContent } from 'components/shared'
 import { BoardCreate } from 'components/kanban/BoardCreate'
 import { colorTypes } from 'lib/data/colors'
 import { Link } from 'react-router-dom'
-import { useQueryClient } from 'react-query'
-import { useBoardsQuery } from 'lib/hooks'
-import { fetchBoard } from 'lib/api/fetchers'
+import { useBoardsQuery, usePrefetchboard } from 'lib/hooks'
 import { FullPageSpinner } from 'components/shared'
 import PropTypes from 'prop-types'
 
@@ -26,10 +24,8 @@ BoardCard.propTypes = {
 }
 
 function BoardCard({ id, title, color }) {
-  const queryClient = useQueryClient()
-  const preFetchBoard = async () => {
-    await queryClient.prefetchQuery(['board', id], fetchBoard(id))
-  }
+  const preFetchBoard = usePrefetchboard(id)
+
   return (
     <Link to={`/board/${id}`} onMouseEnter={preFetchBoard}>
       <div css={[tw`p-[10px]`, cardStyle, colorTypes[color]]}>
