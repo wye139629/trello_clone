@@ -8,6 +8,7 @@ import { useClickOutSide } from 'lib/hooks'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { useParams } from 'react-router-dom'
 import { client } from 'lib/api/client'
+import { fetchBoard } from 'lib/api/fetchers'
 import { v4 as uuidv4 } from 'uuid'
 
 const ContentContainer = styled.div(() => [
@@ -22,11 +23,14 @@ export function BoardBody() {
   const boardContentRef = useRef()
   const addListFormRef = useRef()
   const { boardId } = useParams()
+
   useClickOutSide(addListFormRef, () => setIsOpen(false))
+
   const { isLoading, data: boardData } = useQuery({
     queryKey: ['board', boardId],
-    queryFn: () => client(`boards/${boardId}`).then((res) => res.data),
+    queryFn: fetchBoard(boardId),
   })
+
   const queryClient = useQueryClient()
   const boardCache = queryClient.getQueryData(['board', boardId])
 

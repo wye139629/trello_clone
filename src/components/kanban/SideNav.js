@@ -7,6 +7,7 @@ import { useQueryClient } from 'react-query'
 import { NavLink } from 'react-router-dom'
 import { colorTypes } from 'lib/data/colors'
 import PropTypes from 'prop-types'
+import { usePrefetchboard } from '../../lib/hooks'
 
 const Nav = styled.nav(({ isOpen }) => [
   css`
@@ -40,8 +41,10 @@ SideNav.propTypes = {
 }
 
 function BoardLink({ id, title, color }) {
+  const preFetchBoard = usePrefetchboard(id)
+
   return (
-    <li css={tw`hover:bg-gray-500/30`}>
+    <li css={tw`hover:bg-gray-500/30`} onMouseEnter={preFetchBoard}>
       <NavLink
         to={`/board/${id}`}
         css={tw`flex items-center px-[15px] py-[4px] space-x-2`}

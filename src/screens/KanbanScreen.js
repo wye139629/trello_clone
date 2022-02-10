@@ -5,8 +5,7 @@ import SideNav from 'components/kanban/SideNav'
 import Board from 'components/kanban/Board'
 import { FullPageSpinner } from 'components/shared'
 import { useState } from 'react'
-import { useQuery } from 'react-query'
-import { client } from 'lib/api/client'
+import { useBoardsQuery } from 'lib/hooks'
 import { colorTypes } from 'lib/data/colors'
 import { useParams } from 'react-router-dom'
 
@@ -19,13 +18,7 @@ const KanBan = styled.main`
 export function KanbanScreen() {
   const [isOpen, setIsOpen] = useState(false)
   const { boardId } = useParams()
-  const { isLoading, data: boards } = useQuery({
-    queryKey: 'boards',
-    queryFn: () =>
-      client('/boards').then((res) => {
-        return res.data
-      }),
-  })
+  const { isLoading, data: boards } = useBoardsQuery()
 
   if (isLoading) return <FullPageSpinner />
 

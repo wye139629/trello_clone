@@ -5,8 +5,7 @@ import { Modal, ModalOpenBtn, ModalContent } from 'components/shared'
 import { BoardCreate } from 'components/kanban/BoardCreate'
 import { colorTypes } from 'lib/data/colors'
 import { Link } from 'react-router-dom'
-import { useQuery } from 'react-query'
-import { client } from 'lib/api/client'
+import { useBoardsQuery, usePrefetchboard } from 'lib/hooks'
 import { FullPageSpinner } from 'components/shared'
 import PropTypes from 'prop-types'
 
@@ -25,8 +24,10 @@ BoardCard.propTypes = {
 }
 
 function BoardCard({ id, title, color }) {
+  const preFetchBoard = usePrefetchboard(id)
+
   return (
-    <Link to={`/board/${id}`}>
+    <Link to={`/board/${id}`} onMouseEnter={preFetchBoard}>
       <div css={[tw`p-[10px]`, cardStyle, colorTypes[color]]}>
         <h3 css={tw`text-white font-bold truncate`}>{title}</h3>
       </div>
@@ -35,13 +36,7 @@ function BoardCard({ id, title, color }) {
 }
 
 export function WorkSpaceScreen() {
-  const { isLoading, data: boards } = useQuery({
-    queryKey: 'boards',
-    queryFn: () =>
-      client('/boards').then((res) => {
-        return res.data
-      }),
-  })
+  const { isLoading, data: boards } = useBoardsQuery()
 
   if (isLoading) return <FullPageSpinner />
 
