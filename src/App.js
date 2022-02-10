@@ -1,6 +1,4 @@
-import { AuthenticatedApp } from './screens/AuthenticatedApp'
-
-import { UnAuthenticatedApp } from './screens/UnAuthenticatedApp'
+import { AuthenticatedApp, UnAuthenticatedApp } from './screens'
 import { useAuth } from 'context/authContext'
 
 function App() {
