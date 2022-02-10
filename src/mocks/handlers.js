@@ -3,7 +3,9 @@ import { v4 as uuidv4 } from 'uuid'
 
 const API_URL = 'http://localhost:3000/api/v1'
 const userId = uuidv4()
-const [boardId1, boardId2, boardId3] = new Array(3).fill(uuidv4())
+const [boardId1, boardId2, boardId3] = new Array(3)
+  .fill('1')
+  .map((id) => `${id}${uuidv4()}`)
 
 export const handlers = [
   rest.get(`${API_URL}/auth`, (_, res, ctx) => {
