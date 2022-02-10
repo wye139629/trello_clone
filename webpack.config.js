@@ -5,8 +5,6 @@ const dotenv = require('dotenv')
 const isDevMode = process.env.NODE_ENV === 'development'
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
-const WorkboxPlugin = require('workbox-webpack-plugin')
 const CONTENT_HASH = isDevMode ? '' : '-[contenthash]'
 
 module.exports = {
@@ -101,17 +99,6 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       'process.env': JSON.stringify(dotenv.config().parsed),
-    }),
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: path.resolve(__dirname, './public', 'mockServiceWorker.js'),
-          to: 'mockServiceWorker.js',
-        },
-      ],
-    }),
-    new WorkboxPlugin.GenerateSW({
-      maximumFileSizeToCacheInBytes: 5000000,
     }),
   ],
   optimization: {
