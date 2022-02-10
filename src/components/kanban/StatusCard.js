@@ -115,7 +115,7 @@ export function StatusCard({ list, index }) {
   )
 
   const { mutate: addTodoMutate } = useMutation(
-    (newTodo) => client('tasks', { data: newTodo }),
+    (newTodo) => client('/tasks', { data: newTodo }),
     {
       onMutate: ({ title, list_id: listId, description }) => {
         const previous = queryClient.getQueryData(['board', boardId])

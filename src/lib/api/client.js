@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const BASE_URL =
   process.env.DEV_MODE === 'enabled'
-    ? 'http://localhost:3000/api/v1/'
+    ? 'http://localhost:3000/api/v1'
     : process.env.API_BASE_URL
 
 const ax = axios.create({

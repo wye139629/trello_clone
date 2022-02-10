@@ -31,7 +31,7 @@ export function BoardBody() {
   const boardCache = queryClient.getQueryData(['board', boardId])
 
   const { mutate } = useMutation(
-    (newList) => client('lists', { data: newList }),
+    (newList) => client('/lists', { data: newList }),
     {
       onMutate: (newList) => {
         const optimisticList = { id: uuidv4(), title: newList.title, todos: [] }
