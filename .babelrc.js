@@ -13,5 +13,6 @@ module.exports = {
     'babel-plugin-twin',
     'babel-plugin-macros',
     'transform-inline-environment-variables',
+    '@babel/transform-runtime',
   ],
 }
