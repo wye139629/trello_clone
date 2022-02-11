@@ -15,7 +15,7 @@ const KanBan = styled.main`
   position: relative;
 `
 
-export function KanbanScreen() {
+export default function KanbanScreen() {
   const [isOpen, setIsOpen] = useState(false)
   const { boardId } = useParams()
   const { isLoading, data: boards } = useBoardsQuery()
