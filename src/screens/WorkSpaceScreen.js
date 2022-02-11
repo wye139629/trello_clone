@@ -35,7 +35,7 @@ function BoardCard({ id, title, color }) {
   )
 }
 
-export function WorkSpaceScreen() {
+export default function WorkSpaceScreen() {
   const { isLoading, data: boards } = useBoardsQuery()
 
   if (isLoading) return <FullPageSpinner />

@@ -24,36 +24,6 @@ const Button = styled.button(({ vairant }) => [
   buttonVairants[vairant],
 ])
 
-export function UnAuthenticatedApp() {
-  const { login, register } = useAuth()
-
-  return (
-    <div css={tw`h-screen flex justify-center items-center`}>
-      <div css={tw`text-center space-y-[10px]`}>
-        <h1 css={tw`text-[80px] font-extrabold text-sky-700`}>Willo</h1>
-        <div css={tw`space-x-[20px]`}>
-          <Modal>
-            <ModalOpenBtn>
-              <Button vairant="primary">登入</Button>
-            </ModalOpenBtn>
-            <ModalContent aria-label="Login form" css={modalStyle}>
-              <LoginForm onSubmit={login} action="登入" />
-            </ModalContent>
-          </Modal>
-          <Modal>
-            <ModalOpenBtn>
-              <Button vairant="secondary">註冊</Button>
-            </ModalOpenBtn>
-            <ModalContent aria-label="Registration form" css={modalStyle}>
-              <LoginForm onSubmit={register} action="註冊" />
-            </ModalContent>
-          </Modal>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 LoginForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   action: PropTypes.string.isRequired,
@@ -87,5 +57,35 @@ function LoginForm({ onSubmit, action }) {
       </button>
       {isError ? <Message message={errors.message} type="error" /> : null}
     </form>
+  )
+}
+
+export default function UnAuthenticatedApp() {
+  const { login, register } = useAuth()
+
+  return (
+    <div css={tw`h-screen flex justify-center items-center`}>
+      <div css={tw`text-center space-y-[10px]`}>
+        <h1 css={tw`text-[80px] font-extrabold text-sky-700`}>Willo</h1>
+        <div css={tw`space-x-[20px]`}>
+          <Modal>
+            <ModalOpenBtn>
+              <Button vairant="primary">登入</Button>
+            </ModalOpenBtn>
+            <ModalContent aria-label="Login form" css={modalStyle}>
+              <LoginForm onSubmit={login} action="登入" />
+            </ModalContent>
+          </Modal>
+          <Modal>
+            <ModalOpenBtn>
+              <Button vairant="secondary">註冊</Button>
+            </ModalOpenBtn>
+            <ModalContent aria-label="Registration form" css={modalStyle}>
+              <LoginForm onSubmit={register} action="註冊" />
+            </ModalContent>
+          </Modal>
+        </div>
+      </div>
+    </div>
   )
 }
