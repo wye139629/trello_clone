@@ -1,0 +1,17 @@
+name: Jest CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run all tests
+        run: |
+          yarn install
+          yarn test:all

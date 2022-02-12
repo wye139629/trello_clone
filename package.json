@@ -8,6 +8,7 @@
   },
   "scripts": {
     "test": "jest -o",
+    "test:all": "jest",
     "test:watch": "jest --watch",
     "dev": "cross-env NODE_ENV=development webpack server",
     "lint": "eslint --ignore-path .gitignore .",
