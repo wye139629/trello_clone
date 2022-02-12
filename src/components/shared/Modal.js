@@ -4,7 +4,7 @@ import '@reach/dialog/styles.css'
 import { faTimes } from 'lib/fontawsome/icons'
 import { Icon } from './'
 import { Dialog as ReachDialog } from '@reach/dialog'
-import { callAll } from 'lib/callAll'
+import { callAll } from 'lib/utils/callAll'
 import { useState, useContext, createContext, cloneElement } from 'react'
 import PropTypes from 'prop-types'
 

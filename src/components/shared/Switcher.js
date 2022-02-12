@@ -10,7 +10,7 @@ import {
   cloneElement,
   useImperativeHandle,
 } from 'react'
-import { callAll } from 'lib/callAll'
+import { callAll } from 'lib/utils/callAll'
 import PropTypes from 'prop-types'
 
 Switcher.propTypes = {
