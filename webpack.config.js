@@ -98,7 +98,10 @@ module.exports = {
       filename: `style${CONTENT_HASH}.css`,
     }),
     new webpack.DefinePlugin({
-      'process.env': JSON.stringify(dotenv.config().parsed),
+      'process.env': JSON.stringify({
+        ...dotenv.config().parsed,
+        NODE_ENV: process.env.NODE_ENV,
+      }),
     }),
   ],
   optimization: {
