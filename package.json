@@ -70,7 +70,6 @@
     "file-loader": "^6.2.0",
     "html-loader": "^2.1.2",
     "html-webpack-plugin": "^5.3.2",
-    "http-server": "^0.12.3",
     "husky": "^7.0.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^27.4.5",
@@ -88,7 +87,7 @@
     "style-loader": "^3.1.0",
     "tailwindcss": "^2.2.15",
     "twin.macro": "^2.7.0",
-    "webpack": "^5.65.0",
+    "webpack": "^5.76.0",
     "webpack-cli": "^4.9.1",
     "webpack-dev-server": "^4.6.0"
   },
